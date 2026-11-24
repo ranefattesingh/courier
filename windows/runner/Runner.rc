@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "dev.courier" "\0"
+            VALUE "CompanyName", "Fattesingh Rane" "\0"
             VALUE "FileDescription", "Courier API Client" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "courier" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 dev.courier. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Fattesingh Rane. MIT License." "\0"
             VALUE "OriginalFilename", "courier.exe" "\0"
             VALUE "ProductName", "Courier" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

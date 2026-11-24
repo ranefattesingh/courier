@@ -2,13 +2,20 @@ import 'package:material_ui/material_ui.dart';
 
 import '../models/models.dart';
 
-const accent = Color(0xFFF0883E);
+/// Bhagwa (deep saffron). Dark text is used on top of it for readable contrast.
+const accent = Color(0xFFFF9933);
+
+/// Darker saffron for the light theme, so saffron text stays readable on white.
+const accentOnLight = Color(0xFFCC6600);
+const onAccent = Color(0xFF1A1A1A);
 
 ThemeData buildTheme(bool dark) {
   final scheme = dark
       ? const ColorScheme.dark(
           primary: accent,
+          onPrimary: onAccent,
           secondary: accent,
+          onSecondary: onAccent,
           surface: Color(0xFF212121),
           surfaceContainerLowest: Color(0xFF181818),
           surfaceContainerLow: Color(0xFF1D1D1D),
@@ -22,8 +29,10 @@ ThemeData buildTheme(bool dark) {
           error: Color(0xFFFF6B6B),
         )
       : const ColorScheme.light(
-          primary: Color(0xFFD9661F),
-          secondary: Color(0xFFD9661F),
+          primary: accentOnLight,
+          onPrimary: Colors.white,
+          secondary: accentOnLight,
+          onSecondary: Colors.white,
           surface: Color(0xFFFFFFFF),
           surfaceContainerLowest: Color(0xFFF7F7F7),
           surfaceContainerLow: Color(0xFFF4F4F4),
