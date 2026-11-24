@@ -232,9 +232,15 @@ class AppState extends ChangeNotifier {
     _saveTimer = Timer(const Duration(milliseconds: 400), saveNow);
   }
 
+  /// Overlapping saves (e.g. the debounce timer and the save on exit) each write their own
+  /// temp file, and an older save never replaces a file a newer save has already written.
+  int _saveSeq = 0;
+  final Map<String, int> _writtenSeq = {};
+
   Future<void> saveNow() async {
     if (_dir == null) return;
     _saveTimer?.cancel();
+    final seq = ++_saveSeq;
     final ws = {
       'version': 1,
       'collections': collections.map((c) => c.toJson()).toList(),
@@ -243,19 +249,24 @@ class AppState extends ChangeNotifier {
       'globals': globals.map((e) => e.toJson()).toList(),
       'cookies': cookieJar.cookies.map((c) => c.toJson()).toList(),
     };
-    await _atomicWrite('workspace.json', jsonEncode(ws));
-    await _atomicWrite('settings.json', jsonEncode(settings.toJson()));
-    await _atomicWrite('history.json', jsonEncode(history.map((h) => h.toJson()).toList()));
-    await _atomicWrite('tabs.json', jsonEncode({
+    await _atomicWrite(seq, 'workspace.json', jsonEncode(ws));
+    await _atomicWrite(seq, 'settings.json', jsonEncode(settings.toJson()));
+    await _atomicWrite(seq, 'history.json', jsonEncode(history.map((h) => h.toJson()).toList()));
+    await _atomicWrite(seq, 'tabs.json', jsonEncode({
       'active': activeTab,
       'tabs': tabs.map((t) => {'draft': t.draft.toJson(), 'sourceId': t.sourceId, 'dirty': t.dirty}).toList(),
     }));
   }
 
-  Future<void> _atomicWrite(String name, String content) async {
+  Future<void> _atomicWrite(int seq, String name, String content) async {
     final f = _file(name);
-    final tmp = File('${f.path}.tmp');
+    final tmp = File('${f.path}.$seq.tmp');
     await tmp.writeAsString(content, flush: true);
+    if ((_writtenSeq[name] ?? 0) > seq) {
+      await tmp.delete(); // a newer save already wrote this file
+      return;
+    }
+    _writtenSeq[name] = seq;
     await tmp.rename(f.path);
   }
 

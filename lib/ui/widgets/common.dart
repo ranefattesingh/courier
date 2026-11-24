@@ -792,7 +792,8 @@ class CompactDropdown<T> extends StatelessWidget {
           isDense: true,
           isExpanded: width != null,
           focusColor: Colors.transparent,
-          style: style ?? TextStyle(fontSize: 13, color: cs.onSurface),
+          // Based on the theme's text style so the font matches the rest of the UI.
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 13, color: cs.onSurface).merge(style),
           dropdownColor: cs.surfaceContainerHigh,
           padding: const EdgeInsets.symmetric(vertical: 8),
           items: items.entries.map((e) => DropdownMenuItem<T>(value: e.key, child: Text(e.value, overflow: TextOverflow.ellipsis))).toList(),
@@ -925,7 +926,16 @@ class _SimpleTabsState extends State<SimpleTabs> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     if (_i >= widget.labels.length) _i = 0;
+    return LayoutBuilder(builder: (context, constraints) => _build(context, cs, constraints.maxWidth));
+  }
+
+  Widget _build(BuildContext context, ColorScheme cs, double width) {
+    // In narrow panes (e.g. the response beside the request) the trailing widget gets its own
+    // line, so it doesn't push tabs out of view.
+    final trailingBelow = widget.trailing != null && width < 760;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if (trailingBelow)
+        Align(alignment: Alignment.centerRight, child: SizedBox(height: 34, child: widget.trailing)),
       Container(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant))),
         child: Row(children: [
@@ -953,7 +963,7 @@ class _SimpleTabsState extends State<SimpleTabs> {
               ]),
             ),
           ),
-          if (widget.trailing != null) widget.trailing!,
+          if (widget.trailing != null && !trailingBelow) widget.trailing!,
         ]),
       ),
       Expanded(child: FadeIn(key: ValueKey(_i), child: widget.builders[_i]())),

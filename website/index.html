@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Courier — free, open-source API client</title>
+  <meta name="description" content="Courier is a free, open-source desktop API client for Windows, macOS and Linux. Test REST, GraphQL, gRPC, WebSocket, Socket.IO, MQTT, SSE, SOAP and Kafka. No account, no cloud sync.">
+  <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Courier — free, open-source API client">
+  <meta property="og:description" content="Test REST, GraphQL, gRPC, WebSocket, Kafka and more. Free, open source, no account, no cloud.">
+  <meta property="og:image" content="https://ranefattesingh.github.io/courier/assets/og.png">
+  <meta property="og:url" content="https://ranefattesingh.github.io/courier/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="assets/style.css">
+  <script>try{var t=localStorage.getItem("courier-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <img class="only-light" src="assets/icon-light.png" alt="" width="30" height="30">
+      <img class="only-dark" src="assets/icon-dark.png" alt="" width="30" height="30">
+      Courier
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="#features">Features</a>
+      <a class="hide-sm" href="#install">Install</a>
+      <a href="docs/">Docs</a>
+      <a href="https://github.com/ranefattesingh/courier">GitHub</a>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark theme" title="Switch theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <img class="logo only-light" src="assets/icon-light.png" alt="Courier logo" width="84" height="84">
+      <img class="logo only-dark" src="assets/icon-dark.png" alt="Courier logo" width="84" height="84">
+      <h1>The API client that <span class="hl">stays on your desk</span></h1>
+      <p class="lead">Courier is a free, open-source app for testing APIs: REST, GraphQL, gRPC, WebSocket, Kafka and more. No account, no sign-in, no cloud. Your collections never leave your computer.</p>
+      <div class="cta">
+        <a class="btn btn-primary" id="download-main" href="#install">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
+          <span id="download-label">Download Courier</span>
+        </a>
+        <a class="btn btn-ghost" href="docs/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 21a2 2 0 0 1 2-2h13v2H6"/></svg>
+          Read the docs
+        </a>
+      </div>
+      <p class="cta-note" id="download-note">Windows, macOS and Linux · <a href="https://github.com/ranefattesingh/courier/releases/latest">All downloads</a></p>
+
+      <div class="shot">
+        <img class="only-light" src="img/http-light.webp" width="1440" height="900" alt="Courier in the light theme, showing a GET request with query parameters and its JSON response below it">
+        <img class="only-dark" src="img/http-dark.webp" width="1440" height="900" alt="Courier in the dark theme, showing a GET request with query parameters and its JSON response beside it">
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Every protocol, one app</span>
+        <h2>Test whatever your services speak</h2>
+        <p>No plugins, no extra tools. Each protocol has its own editor built for it.</p>
+      </div>
+      <div class="grid">
+        <div class="card"><h3><span class="tag">HTTP</span> REST</h3><p>Every method and body type, file uploads, cookies, redirects, proxies and client certificates.</p></div>
+        <div class="card"><h3><span class="tag">GQL</span> GraphQL</h3><p>Queries with variables, a schema explorer, and live subscriptions over WebSocket.</p></div>
+        <div class="card"><h3><span class="tag">gRPC</span> gRPC</h3><p>All four call types using server reflection or your own <code>.proto</code> files. No code generation.</p></div>
+        <div class="card"><h3><span class="tag">WS</span> WebSocket</h3><p>Connect, send text, JSON or binary messages, and watch every frame in a searchable log.</p></div>
+        <div class="card"><h3><span class="tag">SIO</span> Socket.IO</h3><p>Namespaces, auth payloads and acknowledgements. Every incoming event is captured.</p></div>
+        <div class="card"><h3><span class="tag">MQTT</span> MQTT</h3><p>Publish and subscribe over TCP, TLS or WebSocket, with QoS, retain and last will.</p></div>
+        <div class="card"><h3><span class="tag">SSE</span> Server-Sent Events</h3><p>Stream events from any endpoint, including streaming LLM APIs that need a POST body.</p></div>
+        <div class="card"><h3><span class="tag">SOAP</span> SOAP</h3><p>Import a WSDL, pick an operation and get a ready-made envelope. WS-Security included.</p></div>
+        <div class="card"><h3><span class="tag">KAFKA</span> Kafka</h3><p>Produce and consume messages directly, with SASL and TLS. No Java or extra tools needed.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt">
+    <div class="wrap">
+      <div class="feature">
+        <div>
+          <span class="eyebrow">Organise</span>
+          <h3>Collections, folders and environments</h3>
+          <p>Group requests by project or microservice, nest folders as deep as you like, and switch between Dev, Staging and Production with one click.</p>
+          <ul>
+            <li><code>{{variables}}</code> work everywhere and turn red when undefined</li>
+            <li>Secret values stay masked on screen</li>
+            <li>Set auth once on a folder; every request inside inherits it</li>
+          </ul>
+        </div>
+        <div class="shot"><img src="img/environments.webp" width="1440" height="900" loading="lazy" alt="The environment editor for a Development environment with a base URL and a masked token"></div>
+      </div>
+
+      <div class="feature flip">
+        <div>
+          <span class="eyebrow">Automate</span>
+          <h3>Tests, chained requests and a runner</h3>
+          <p>Check status codes, headers and JSON fields without writing scripts. Capture a value from one response and use it in the next request.</p>
+          <ul>
+            <li>Assertions on status, timing, headers, body text and JSON paths</li>
+            <li>Run a whole folder in order, with iterations and a pass/fail summary</li>
+            <li>Code snippets in 9 languages, from cURL to Go</li>
+          </ul>
+        </div>
+        <div class="shot"><img src="img/runner.webp" width="1440" height="900" loading="lazy" alt="The Collection Runner after running two requests, both passing with 3 of 3 tests"></div>
+      </div>
+
+      <div class="feature">
+        <div>
+          <span class="eyebrow">Secure</span>
+          <h3>Every common auth scheme, built in</h3>
+          <p>From a simple API key to the OAuth 2.0 browser flow with PKCE. Courier opens your browser, catches the callback and stores the token.</p>
+          <ul>
+            <li>API key, Bearer, Basic, Digest, NTLM</li>
+            <li>OAuth 1.0 and OAuth 2.0 (all grant types)</li>
+            <li>AWS Signature v4, Hawk, Akamai EdgeGrid, JWT</li>
+          </ul>
+        </div>
+        <div class="shot"><img src="img/auth.webp" width="1440" height="900" loading="lazy" alt="The Authorization tab configured for OAuth 2.0 with the Authorization Code with PKCE grant"></div>
+      </div>
+
+      <div class="feature flip">
+        <div>
+          <span class="eyebrow">Real time</span>
+          <h3>Live connections you can watch</h3>
+          <p>WebSocket, Socket.IO, MQTT, SSE and Kafka sessions show every message as it arrives, with timestamps, search and export.</p>
+          <ul>
+            <li>Send text, JSON, XML or binary messages</li>
+            <li>Filter sent and received messages, copy any one</li>
+            <li>Several connections can stay open in different tabs</li>
+          </ul>
+        </div>
+        <div class="shot"><img src="img/websocket.webp" width="1440" height="900" loading="lazy" alt="A WebSocket connection with sent and received messages in the message log"></div>
+      </div>
+
+      <div class="feature">
+        <div>
+          <span class="eyebrow">Bring your work</span>
+          <h3>Import from Postman and Insomnia</h3>
+          <p>Move over in a minute. Courier reads Postman collections, environments and full data dumps, Insomnia exports, and cURL commands.</p>
+          <ul>
+            <li>Folders, auth, bodies and variables come across</li>
+            <li>Export to Courier JSON or Postman Collection v2.1</li>
+            <li>Paste a cURL command and it becomes a request</li>
+          </ul>
+        </div>
+        <div class="shot"><img src="img/import.webp" width="1440" height="900" loading="lazy" alt="The Import dialog with options to upload a file or paste text"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Why Courier</span>
+        <h2>Simple, private and yours</h2>
+      </div>
+      <div class="principles">
+        <div><span class="num">01</span><h3>Local first</h3><p>Everything is saved as plain JSON files on your computer. No account, no sync, no telemetry.</p></div>
+        <div><span class="num">02</span><h3>Free forever</h3><p>MIT licensed and open source. No paid tier, no request limits, no feature gates.</p></div>
+        <div><span class="num">03</span><h3>Native and fast</h3><p>A real desktop app for Windows, macOS and Linux. It starts quickly and stays light.</p></div>
+        <div><span class="num">04</span><h3>Familiar</h3><p>Collections, tabs, environments, history. If you have used an API client before, you already know it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt" id="install">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Install</span>
+        <h2>Get Courier</h2>
+        <p>Version <span data-version>1.0</span>. Pick your system below.</p>
+      </div>
+
+      <div class="tabs" data-tabs>
+        <div class="tablist" role="tablist" aria-label="Operating system">
+          <button role="tab" id="btn-windows" aria-controls="tab-windows" aria-selected="true">Windows</button>
+          <button role="tab" id="btn-macos" aria-controls="tab-macos" aria-selected="false" tabindex="-1">macOS</button>
+          <button role="tab" id="btn-debian" aria-controls="tab-debian" aria-selected="false" tabindex="-1">Ubuntu / Debian</button>
+          <button role="tab" id="btn-fedora" aria-controls="tab-fedora" aria-selected="false" tabindex="-1">Fedora / RHEL</button>
+          <button role="tab" id="btn-other" aria-controls="tab-other" aria-selected="false" tabindex="-1">Other Linux</button>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="tab-windows" aria-labelledby="btn-windows">
+          <p>Windows 10 or 11, 64-bit. No admin rights needed.</p>
+          <p>
+            <a class="btn btn-primary" data-asset="windows" href="https://github.com/ranefattesingh/courier/releases/latest">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
+              Download installer (.exe)
+            </a>
+          </p>
+          <div class="note warn"><strong>Seeing “Windows protected your PC”?</strong> The installer isn’t code-signed yet. Click <b>More info</b>, then <b>Run anyway</b>.</div>
+          <p>Prefer no installer? Get the <a data-asset="windows-zip" href="https://github.com/ranefattesingh/courier/releases/latest">portable .zip</a>, extract it anywhere and run <code>courier.exe</code>.</p>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="tab-macos" aria-labelledby="btn-macos" hidden>
+          <p>macOS 12 Monterey or newer. One app for both Apple Silicon and Intel Macs.</p>
+          <h4>With Homebrew</h4>
+<pre data-copy>brew install --cask ranefattesingh/tap/courier</pre>
+          <h4>Or download</h4>
+          <p><a class="btn btn-ghost" data-asset="macos" href="https://github.com/ranefattesingh/courier/releases/latest">Download for macOS (.zip)</a></p>
+          <p>Unzip it and drag <b>Courier</b> into your Applications folder.</p>
+          <div class="note warn"><strong>First launch</strong> The app isn’t notarized by Apple yet, so macOS blocks it the first time. Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>. You only do this once.</div>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="tab-debian" aria-labelledby="btn-debian" hidden>
+          <p>Ubuntu 22.04 or newer, Debian 12 or newer, Linux Mint, Pop!_OS and other Debian-based systems (64-bit Intel/AMD). Adding the repository keeps Courier updated with <code>apt upgrade</code>.</p>
+<pre data-copy>sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://ranefattesingh.github.io/courier/courier.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/courier.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/courier.gpg] https://ranefattesingh.github.io/courier/apt stable main" | sudo tee /etc/apt/sources.list.d/courier.list
+sudo apt update &amp;&amp; sudo apt install courier-api</pre>
+          <p>Then open <b>Courier</b> from your app menu, or run <code>courier-api</code> in a terminal. Prefer a single file? <a data-asset="deb" href="https://github.com/ranefattesingh/courier/releases/latest">Download the .deb</a>.</p>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="tab-fedora" aria-labelledby="btn-fedora" hidden>
+          <p>Fedora 36 or newer, RHEL, Rocky and AlmaLinux 9 (64-bit Intel/AMD). Updates arrive with <code>dnf upgrade</code>.</p>
+<pre data-copy>sudo curl -fsSL -o /etc/yum.repos.d/courier.repo https://ranefattesingh.github.io/courier/rpm/courier.repo
+sudo dnf install courier-api</pre>
+          <p>The first time, dnf asks you to trust the Courier signing key: answer <b>y</b>. Prefer a single file? <a data-asset="rpm" href="https://github.com/ranefattesingh/courier/releases/latest">Download the .rpm</a>.</p>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="tab-other" aria-labelledby="btn-other" hidden>
+          <p>For other 64-bit Linux distributions, use the portable archive. It needs GTK 3 installed.</p>
+<pre data-copy>mkdir -p ~/.local/opt/courier
+curl -fsSL https://github.com/ranefattesingh/courier/releases/latest/download/courier-linux-x64.tar.gz | tar -xz -C ~/.local/opt/courier
+~/.local/opt/courier/courier</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <p><b>Courier</b> · Free and open source under the MIT License.</p>
+      <p>Courier is an independent project and is not affiliated with Postman, Inc., Kong Inc. (Insomnia) or courier.com.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="docs/">Documentation</a>
+      <a href="https://github.com/ranefattesingh/courier/releases">Releases</a>
+      <a href="https://github.com/ranefattesingh/courier/issues">Report a bug</a>
+      <a href="https://github.com/ranefattesingh/courier">Source code</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>

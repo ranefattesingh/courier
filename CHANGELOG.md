@@ -2,6 +2,17 @@
 
 All notable changes to Courier are listed here. Each release on GitHub uses the matching section below.
 
+## [1.0.1]
+
+### New
+- **Website and documentation** at https://ranefattesingh.github.io/courier/, with install instructions for every platform and a full user guide.
+
+### Fixed
+- The **Bulk Edit** button in the Params, Headers, form body and variable tables no longer wraps onto several lines. It now sits just above the table and stays in the same place when you switch to bulk editing and back.
+- With the response shown **side by side**, the Test Results and Request tabs are no longer pushed out of view. In narrow panes the status, time and size move to their own line.
+- Dropdowns, the Pretty/Raw switch and menus now use the same font as the rest of the app.
+- Fixed a rare error when two saves happened at the same moment, for example when closing the app just as it saved automatically.
+
 ## [1.0.0]
 
 First public release of **Courier**, a free, open-source desktop API client for Windows, macOS and Linux.
