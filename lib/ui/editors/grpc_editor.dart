@@ -101,18 +101,19 @@ class _GrpcEditorState extends State<GrpcEditor> {
           child: Text('${method.kind}  ·  ${method.inputType} → ${method.outputType}', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
         ),
       Expanded(
-        child: SplitView(
+        child: requestResponseSplit(
+          ctx,
           initial: 0.52,
-          first: SimpleTabs(
+          request: SimpleTabs(
             key: ValueKey('grpc${tab.id}'),
             labels: ['Message', 'Metadata (${r.headers.where((h) => h.enabled && h.key.isNotEmpty).length})', 'Authorization', 'Service definition', 'Tests', 'Settings', 'Docs'],
             builders: [
               () => Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      Row(children: [
+                      Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 4, runSpacing: 4, children: [
                         Text('Request message (JSON)', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
-                        const Spacer(),
+                        const SizedBox(width: 12),
                         TextButton.icon(
                           onPressed: method == null
                               ? null
@@ -125,9 +126,7 @@ class _GrpcEditorState extends State<GrpcEditor> {
                         ),
                         TextButton(onPressed: () => {r.message = beautify(r.message, 'json'), ctx.changed()}, child: const Text('Beautify')),
                         if (method != null && method.clientStreaming) ...[
-                          const SizedBox(width: 6),
                           FilledButton.tonal(onPressed: canSend ? () => sendGrpcStreamMessage(ctx.state, tab) : null, child: const Text('Send message')),
-                          const SizedBox(width: 6),
                           OutlinedButton(onPressed: canSend ? () => endGrpcStream(tab) : null, child: const Text('End streaming')),
                         ],
                       ]),
@@ -154,7 +153,7 @@ class _GrpcEditorState extends State<GrpcEditor> {
               () => descriptionTab(ctx),
             ],
           ),
-          second: streaming || (tab.logs.isNotEmpty && tab.response == null)
+          response: streaming || (tab.logs.isNotEmpty && tab.response == null)
               ? MessageLog(messages: tab.logs, onClear: () => {tab.logs.clear(), tab.touch()}, emptyText: 'Invoke the stream to see messages')
               : ResponseView(response: tab.response, loading: tab.sending, isGrpc: true, onCancel: () => invokeGrpc(ctx.state, tab)),
         ),

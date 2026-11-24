@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:courier/main.dart';
 import 'package:courier/models/models.dart';
 import 'package:courier/state/app_state.dart';
+import 'package:courier/ui/widgets/common.dart';
 import 'package:flutter/gestures.dart' show kSecondaryButton;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -103,6 +104,33 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(Dialog), findsNothing);
+
+    // Request/response layout: stacked by default, toggle to side by side and back.
+    SplitView split() => tester.widget<SplitView>(find.byType(SplitView).first);
+    expect(split().axis, Axis.vertical);
+    await tester.tap(find.byTooltip('Response below — switch to side-by-side view'));
+    await tester.pumpAndSettle();
+    expect(state.settings.responsePane, 'right');
+    expect(split().axis, Axis.horizontal);
+    for (final t in RequestType.values) {
+      state.newTab(t);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: 'side-by-side ${t.label}');
+    }
+    await tester.tap(find.text('Side by side'));
+    await tester.pumpAndSettle();
+    expect(split().axis, Axis.vertical);
+
+    // Export dialog.
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Export'));
+    await tester.pumpAndSettle();
+    expect(find.text('Courier JSON'), findsOneWidget);
+    await tester.tap(find.text('Postman Collection v2.1 JSON'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('will be left out'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
     // Light theme renders too.
     state.updateSettings((s) => s.darkMode = false);
     await tester.pumpAndSettle();
@@ -123,6 +151,7 @@ void main() {
     expect(reloaded.collections.first.name, 'Sample API Collection');
     expect(reloaded.tabs.length, state.tabs.length);
     expect(reloaded.settings.darkMode, isFalse);
+    expect(reloaded.settings.responsePane, 'bottom');
     dir.deleteSync(recursive: true);
   });
 }

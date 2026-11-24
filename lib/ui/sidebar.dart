@@ -121,6 +121,7 @@ class _CollectionsPanelState extends State<_CollectionsPanel> {
             ),
           ),
           IconButton(tooltip: 'Import', iconSize: 18, icon: const Icon(Icons.file_download_outlined), onPressed: () => showImportDialog(context, state)),
+          IconButton(tooltip: 'Export', iconSize: 18, icon: const Icon(Icons.file_upload_outlined), onPressed: () => showExportDialog(context, state)),
         ]),
       ),
       Expanded(
@@ -181,8 +182,9 @@ class _TreeRowState extends State<_TreeRow> {
       const PopupMenuItem(value: 'rename', height: 30, child: Text('Rename')),
       const PopupMenuItem(value: 'duplicate', height: 30, child: Text('Duplicate')),
       if (isFolder) ...[
-        const PopupMenuItem(value: 'export', height: 30, child: Text('Export (Courier)')),
-        const PopupMenuItem(value: 'exportpm', height: 30, child: Text('Export (Postman v2.1)')),
+        if (isCollection) const PopupMenuItem(value: 'exportdlg', height: 30, child: Text('Export…')),
+        if (!isCollection) const PopupMenuItem(value: 'export', height: 30, child: Text('Export folder (Courier JSON)')),
+        if (!isCollection) const PopupMenuItem(value: 'exportpm', height: 30, child: Text('Export folder (Postman v2.1)')),
       ],
       const PopupMenuDivider(),
       PopupMenuItem(value: 'delete', height: 30, child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error))),
@@ -210,6 +212,8 @@ class _TreeRowState extends State<_TreeRow> {
         if (name != null) state.renameNode(n.id, name);
       case 'duplicate':
         state.duplicateNode(n.id);
+      case 'exportdlg':
+        await showExportDialog(context, state, initial: n as Folder);
       case 'export':
         await exportCollection(context, n as Folder, postman: false);
       case 'exportpm':

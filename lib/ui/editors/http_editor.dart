@@ -60,10 +60,10 @@ class HttpEditor extends StatelessWidget {
         onPrimary: () => runPrimaryAction(ctx.state, tab),
       ),
       Expanded(
-        child: SplitView(
-          initial: 0.5,
-          first: SimpleTabs(key: ValueKey('reqtabs${tab.id}${r.type}'), labels: labels, builders: builders),
-          second: subscription
+        child: requestResponseSplit(
+          ctx,
+          request: SimpleTabs(key: ValueKey('reqtabs${tab.id}${r.type}'), labels: labels, builders: builders),
+          response: subscription
               ? MessageLog(messages: tab.logs, onClear: () => {tab.logs.clear(), tab.touch()}, emptyText: 'Subscribe to receive events')
               : ResponseView(response: tab.response, loading: tab.sending, onCancel: () => tab.httpEngine?.cancel()),
         ),
@@ -466,14 +466,12 @@ class _SoapBodyState extends State<_SoapBody> {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
+        Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
           SizedBox(
             width: 300,
             child: SyncedTextField(value: r.opt('wsdlUrl'), hint: 'WSDL URL (default: <endpoint>?wsdl)', scope: ctx.scope, onChanged: (v) => r.opts['wsdlUrl'] = v),
           ),
-          const SizedBox(width: 6),
           OutlinedButton(onPressed: _loading ? null : () => _loadWsdl(), child: Text(_loading ? 'Loading…' : 'Load WSDL')),
-          const SizedBox(width: 6),
           OutlinedButton(
             onPressed: _loading
                 ? null
@@ -483,35 +481,29 @@ class _SoapBodyState extends State<_SoapBody> {
                   },
             child: const Text('Import file'),
           ),
-          const SizedBox(width: 10),
           if (ops.isNotEmpty)
-            Expanded(
-              child: CompactDropdown<String>(
-                width: 260,
-                value: r.opt('soapOperation', '${ops.first.name}/${ops.first.version}'),
-                items: {for (final o in ops) '${o.name}/${o.version}': '${o.name} (SOAP ${o.version})'},
-                onChanged: (v) => _applyOp(ops.firstWhere((o) => '${o.name}/${o.version}' == v)),
-              ),
+            CompactDropdown<String>(
+              width: 260,
+              value: r.opt('soapOperation', '${ops.first.name}/${ops.first.version}'),
+              items: {for (final o in ops) '${o.name}/${o.version}': '${o.name} (SOAP ${o.version})'},
+              onChanged: (v) => _applyOp(ops.firstWhere((o) => '${o.name}/${o.version}' == v)),
             ),
         ]),
         if (_error != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_error!, style: TextStyle(color: cs.error, fontSize: 12))),
         const SizedBox(height: 8),
-        Row(children: [
+        Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
           CompactDropdown<String>(value: r.opt('soapVersion', '1.1'), items: const {'1.1': 'SOAP 1.1', '1.2': 'SOAP 1.2'}, onChanged: (v) => set('soapVersion', v)),
-          const SizedBox(width: 8),
-          Expanded(
+          SizedBox(
+            width: 300,
             child: SyncedTextField(value: r.opt('soapAction'), hint: 'SOAPAction', scope: ctx.scope, onChanged: (v) => {r.opts['soapAction'] = v, ctx.changed()}),
           ),
-          const SizedBox(width: 8),
           CompactDropdown<String>(
             value: r.opt('wsseType', 'none'),
             items: const {'none': 'No WS-Security', 'text': 'WSS UsernameToken (PasswordText)', 'digest': 'WSS UsernameToken (PasswordDigest)'},
             onChanged: (v) => set('wsseType', v),
           ),
           if (r.opt('wsseType', 'none') != 'none') ...[
-            const SizedBox(width: 6),
             SizedBox(width: 130, child: SyncedTextField(value: r.opt('wsseUser'), hint: 'Username', scope: ctx.scope, onChanged: (v) => {r.opts['wsseUser'] = v, ctx.changed()})),
-            const SizedBox(width: 6),
             SizedBox(width: 130, child: SyncedTextField(value: r.opt('wssePass'), hint: 'Password', obscure: true, scope: ctx.scope, onChanged: (v) => {r.opts['wssePass'] = v, ctx.changed()})),
           ],
           TextButton(onPressed: () => {r.body.raw = beautify(r.body.raw, 'xml'), ctx.changed(), setState(() {})}, child: const Text('Beautify')),
