@@ -37,6 +37,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(state.currentTab!.draft.name, 'Get with query params');
 
+    // Folder expand/collapse animates, and collapsed children are not built at all.
+    expect(find.text('Basic auth'), findsNothing);
+    await tester.tap(find.text('Auth Examples'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 60));
+    expect(find.text('Basic auth'), findsOneWidget, reason: 'children appear during the expand animation');
+    expect(tester.hasRunningAnimations, isTrue);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Auth Examples'));
+    await tester.pumpAndSettle();
+    expect(find.text('Basic auth'), findsNothing, reason: 'collapsed children are removed after the animation');
+
+    // With animations turned off, expanding is instant.
+    state.updateSettings((s) => s.animations = false);
+    await tester.pump();
+    await tester.tap(find.text('Auth Examples'));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Basic auth'), findsOneWidget);
+    expect(tester.hasRunningAnimations, isFalse);
+    state.updateSettings((s) => s.animations = true);
+    await tester.pumpAndSettle();
+
     // Switch through request sub-tabs of an HTTP request.
     for (final label in ['Authorization', 'Body', 'Tests', 'Settings', 'Docs']) {
       final f = find.textContaining(label);

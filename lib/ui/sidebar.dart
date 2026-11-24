@@ -7,6 +7,7 @@ import 'dialogs/dialogs.dart';
 import 'dialogs/runner.dart';
 import 'theme.dart';
 import 'widgets/common.dart';
+import 'widgets/motion.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -50,11 +51,14 @@ class Sidebar extends StatelessWidget {
           ]),
         ),
         Expanded(
-          child: switch (state.sidebarSection) {
-            'environments' => const _EnvironmentsPanel(),
-            'history' => const _HistoryPanel(),
-            _ => const _CollectionsPanel(),
-          },
+          child: FadeIn(
+            key: ValueKey('section-${state.sidebarSection}'),
+            child: switch (state.sidebarSection) {
+              'environments' => const _EnvironmentsPanel(),
+              'history' => const _HistoryPanel(),
+              _ => const _CollectionsPanel(),
+            },
+          ),
         ),
       ]),
     );
@@ -86,20 +90,25 @@ class _CollectionsPanelState extends State<_CollectionsPanel> {
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final cs = Theme.of(context).colorScheme;
-    final rows = <Widget>[];
-    void walk(Node n, int depth) {
-      if (!_matches(n)) return;
-      rows.add(_TreeRow(node: n, depth: depth, filtering: _filter.isNotEmpty));
-      if (n is Folder && (n.expanded || _filter.isNotEmpty)) {
-        for (final c in n.children) {
-          walk(c, depth + 1);
-        }
-      }
+    final filtering = _filter.isNotEmpty;
+    // Each folder's children live in an ExpandSection so opening/closing animates smoothly.
+    Widget? node(Node n, int depth) {
+      if (!_matches(n)) return null;
+      final row = _TreeRow(key: ValueKey('row-${n.id}'), node: n, depth: depth, filtering: filtering);
+      if (n is! Folder) return row;
+      return Column(key: ValueKey('node-${n.id}'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        row,
+        ExpandSection(
+          expanded: n.expanded || filtering,
+          builder: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [for (final c in n.children) ?node(c, depth + 1)],
+          ),
+        ),
+      ]);
     }
 
-    for (final c in state.collections) {
-      walk(c, 0);
-    }
+    final rows = [for (final c in state.collections) ?node(c, 0)];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(8, 8, 4, 4),
@@ -151,7 +160,7 @@ class _TreeRow extends StatefulWidget {
   final Node node;
   final int depth;
   final bool filtering;
-  const _TreeRow({required this.node, required this.depth, required this.filtering});
+  const _TreeRow({super.key, required this.node, required this.depth, required this.filtering});
 
   @override
   State<_TreeRow> createState() => _TreeRowState();
@@ -233,13 +242,20 @@ class _TreeRowState extends State<_TreeRow> {
     final selected = state.selectedNodeId == n.id;
     final indent = 8.0 + widget.depth * 14;
 
-    final content = Container(
+    final content = AnimatedContainer(
+      duration: Motion.of(context, Motion.fast),
+      curve: Curves.easeOut,
       height: 30,
       padding: EdgeInsets.only(left: indent, right: 2),
-      color: selected ? cs.primary.withValues(alpha: 0.12) : (_hover ? cs.surfaceContainerHigh : null),
+      color: selected ? cs.primary.withValues(alpha: 0.12) : (_hover ? cs.surfaceContainerHigh : cs.surfaceContainerHigh.withValues(alpha: 0)),
       child: Row(children: [
         if (n is Folder)
-          Icon(n.expanded || widget.filtering ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right, size: 16, color: cs.onSurfaceVariant)
+          AnimatedRotation(
+            turns: n.expanded || widget.filtering ? 0.25 : 0,
+            duration: Motion.of(context),
+            curve: Motion.curve,
+            child: Icon(Icons.keyboard_arrow_right, size: 16, color: cs.onSurfaceVariant),
+          )
         else
           const SizedBox(width: 2),
         if (n is Folder) ...[
@@ -278,12 +294,8 @@ class _TreeRowState extends State<_TreeRow> {
             state.openRequest(n as ApiRequest);
           }
         },
-        onDoubleTap: n is ApiRequest
-            ? null
-            : () async {
-                final name = await promptText(context, 'Rename', initial: n.name);
-                if (name != null) state.renameNode(n.id, name);
-              },
+        // No double-tap handler here: it would delay every single click by ~300 ms while
+        // Flutter waits to rule out a double click. Rename is in the context menu.
         onSecondaryTapDown: (d) => _menu(context, d.globalPosition),
         child: content,
       ),

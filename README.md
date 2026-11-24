@@ -4,6 +4,43 @@ A local-first API testing tool for **Windows, macOS (Apple Silicon + Intel) and 
 Classic API-client workflow: collections → folders → requests, tabs, environments, history.
 No accounts, no sign-in, no cloud sync. Everything stays on your machine.
 
+## Install
+
+Downloads for every platform are on the [Releases page](https://github.com/ranefattesingh/courier/releases/latest).
+
+**Windows 10/11** — download `Courier-Setup-<version>-x64.exe` and run it. No admin rights needed (it installs per-user by
+default; choose "all users" in the installer if you prefer). A portable `.zip` is also available.
+> The installer isn't code-signed yet, so Windows SmartScreen may say *"Windows protected your PC"*. Click **More info → Run anyway**.
+
+**macOS 12+ (Apple Silicon and Intel)** — with [Homebrew](https://brew.sh):
+```bash
+brew install --cask ranefattesingh/tap/courier
+```
+or download `courier-macos-universal.zip`, unzip, and drag **Courier.app** to Applications.
+> The app isn't notarized yet. On first launch macOS will block it: open **System Settings → Privacy & Security**, scroll down
+> and click **Open Anyway** next to the Courier message. You only need to do this once.
+
+**Debian / Ubuntu / Linux Mint / Pop!_OS** (apt):
+```bash
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://ranefattesingh.github.io/courier/courier.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/courier.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/courier.gpg] https://ranefattesingh.github.io/courier/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/courier.list
+sudo apt update && sudo apt install courier-api
+```
+Or install the downloaded file directly: `sudo apt install ./courier-api_<version>_amd64.deb`.
+
+**Fedora / RHEL / Rocky / Alma** (dnf):
+```bash
+sudo curl -fsSL -o /etc/yum.repos.d/courier.repo https://ranefattesingh.github.io/courier/rpm/courier.repo
+sudo dnf install courier-api
+```
+Or: `sudo dnf install ./courier-api-<version>-1.x86_64.rpm`.
+
+On Linux, launch **Courier** from your app menu or run `courier-api`. The package is named `courier-api` because
+`courier` is already taken by the Courier mail-server packages in Debian and Fedora. Updates arrive through your
+normal `apt upgrade` / `dnf upgrade` once the repository is added. A portable `courier-linux-x64.tar.gz` is also provided.
+
 ## Protocols
 
 | Type | What you can do |
@@ -70,14 +107,56 @@ flutter build macos --release        # → build/macos/Build/Products/Release/Co
 The macOS release build is a universal binary (arm64 + x86_64), so the same `.app` runs natively on Apple Silicon and Intel.
 Network client/server (OAuth callback) and user-selected file access are enabled in the sandbox entitlements.
 
-**CI**: `.github/workflows/build.yml` tests the project, then builds Linux, Windows and macOS artifacts on every push.
-Pushing a `v*` tag publishes them to a GitHub Release.
+**Linux packages locally**: after `flutter build linux --release`, run `packaging/linux/build-packages.sh <version>`
+to produce the `.deb`, the tarball and (if `rpmbuild` is installed) the `.rpm` in `dist/`.
+
+**Windows installer locally**: install [Inno Setup 6](https://jrsoftware.org/isinfo.php), then
+`iscc /DAppVersion=<version> packaging\windows\courier.iss` → `dist\Courier-Setup-<version>-x64.exe`.
+
+**App icon**: edit `assets/icons/courier_dark.png` / `courier_light.png` (ideally 1024×1024), then run
+`python3 tool/generate_icons.py` (needs `pip install pillow`) to regenerate the macOS, Windows and Linux icons.
+
+## Releasing
+
+`.github/workflows/build.yml` runs the tests and builds all platforms on every push and pull request.
+To publish a release:
+
+1. Set `version:` in `pubspec.yaml` (e.g. `1.1.0+2`), add a `## [1.1.0]` section to `CHANGELOG.md`
+   (it becomes the release notes; the release fails without it), commit, and push a matching tag:
+   ```bash
+   git tag v1.1.0 && git push origin v1.1.0
+   ```
+2. CI creates a GitHub Release containing the Windows installer + portable zip, the macOS universal zip,
+   the `.deb`, `.rpm`, Linux tarball, and `SHA256SUMS.txt`.
+
+Two optional channels need a one-time setup. Until then, those CI jobs just print "skipped".
+
+**apt + dnf repositories (GitHub Pages)**
+1. Create a dedicated signing key **without a passphrase** (it only signs package indexes):
+   ```bash
+   gpg --batch --passphrase '' --quick-gen-key "Courier Packages <you@example.com>" rsa4096 sign never
+   gpg --armor --export-secret-keys "Courier Packages" > courier-signing-key.asc
+   ```
+2. In the GitHub repo: **Settings → Secrets and variables → Actions → New secret** named `LINUX_REPO_GPG_KEY`
+   with the contents of `courier-signing-key.asc`. Then delete the local file, and keep a backup of the key somewhere safe:
+   losing it means users must re-import a new key.
+3. After the first tagged release, go to **Settings → Pages**, choose **Deploy from a branch → `gh-pages` / root**.
+   The repositories are served from `https://ranefattesingh.github.io/courier/`.
+
+**Homebrew tap**
+1. Create a public GitHub repo named **`homebrew-tap`** (with a README so it has a default branch).
+2. Create a fine-grained personal access token with **Contents: read and write** on that repo only, and add it to
+   this repo as the Actions secret `HOMEBREW_TAP_TOKEN`.
+3. Each tagged release then writes `Casks/courier.rb` to the tap with the new version and checksum.
+
+**Code signing (optional, later)**: an Apple Developer ID ($99/yr) with notarization removes the macOS
+"Open Anyway" step, and a Windows code-signing certificate (or Azure Trusted Signing) removes the SmartScreen prompt.
 
 ## Where data is stored
 Everything is saved automatically as JSON in the app-support directory, in a `courier/` subfolder:
-- Linux: `~/.local/share/dev.courier.courier/courier/`
-- Windows: `%APPDATA%\dev.courier\courier\courier\`
-- macOS: `~/Library/Application Support/dev.courier.courier/courier/`
+- Linux: `~/.local/share/io.github.ranefattesingh.courier/courier/`
+- Windows: `%APPDATA%\Fattesingh Rane\Courier\courier\`
+- macOS: `~/Library/Containers/io.github.ranefattesingh.courier/Data/Library/Application Support/io.github.ranefattesingh.courier/courier/`
 
 Files: `workspace.json` (collections, environments, globals, cookies), `settings.json`, `history.json`, `tabs.json` (open tabs, including unsaved drafts).
 
@@ -91,3 +170,11 @@ lib/
   ui/                home, sidebar, editors per protocol, dialogs (runner, settings, environments, import/export…)
 test/                engine integration tests against live local servers + full-app widget test
 ```
+
+## License
+
+[MIT](LICENSE) © 2026 Fattesingh Rane
+
+Courier is an independent project. It is not affiliated with, endorsed by, or sponsored by Postman, Inc.,
+Kong Inc. (Insomnia), or Courier (courier.com). Postman and Insomnia are trademarks of their respective owners
+and are mentioned only to describe import/export compatibility.

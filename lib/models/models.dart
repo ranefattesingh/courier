@@ -472,6 +472,9 @@ class AppSettings {
   /// Where the response pane sits: 'bottom' (stacked) or 'right' (side by side).
   String responsePane;
 
+  /// Subtle UI animations (expand/collapse, fades). Also off when the OS requests reduced motion.
+  bool animations;
+
   AppSettings({
     this.darkMode = true,
     this.timeoutMs = 0,
@@ -492,6 +495,7 @@ class AppSettings {
     this.autoSaveCookies = true,
     this.editorFontSize = 13,
     this.responsePane = 'bottom',
+    this.animations = true,
   });
 
   Map<String, dynamic> toJson() => {
@@ -514,6 +518,7 @@ class AppSettings {
         'autoSaveCookies': autoSaveCookies,
         'editorFontSize': editorFontSize,
         'responsePane': responsePane,
+        'animations': animations,
       };
 
   factory AppSettings.fromJson(Map j) => AppSettings(
@@ -536,6 +541,7 @@ class AppSettings {
         autoSaveCookies: j['autoSaveCookies'] != false,
         editorFontSize: (j['editorFontSize'] as num?)?.toDouble() ?? 13,
         responsePane: j['responsePane'] == 'right' ? 'right' : 'bottom',
+        animations: j['animations'] != false,
       );
 }
 

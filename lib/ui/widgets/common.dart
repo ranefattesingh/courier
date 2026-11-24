@@ -10,6 +10,7 @@ import 'package:xml/xml.dart';
 import '../../core/variables.dart';
 import '../../models/models.dart' hide Node;
 import '../theme.dart';
+import 'motion.dart';
 
 bool _languagesRegistered = false;
 void _ensureLanguages() {
@@ -927,10 +928,12 @@ class _SimpleTabsState extends State<SimpleTabs> {
                       setState(() => _i = i);
                       widget.onChanged?.call(i);
                     },
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: Motion.of(context, Motion.fast),
+                      curve: Curves.easeOut,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                       decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: i == _i ? cs.primary : Colors.transparent, width: 2)),
+                        border: Border(bottom: BorderSide(color: i == _i ? cs.primary : cs.primary.withValues(alpha: 0), width: 2)),
                       ),
                       child: Text(widget.labels[i],
                           style: TextStyle(fontSize: 13, color: i == _i ? cs.onSurface : cs.onSurfaceVariant, fontWeight: i == _i ? FontWeight.w500 : FontWeight.normal)),
@@ -942,7 +945,7 @@ class _SimpleTabsState extends State<SimpleTabs> {
           if (widget.trailing != null) widget.trailing!,
         ]),
       ),
-      Expanded(child: widget.builders[_i]()),
+      Expanded(child: FadeIn(key: ValueKey(_i), child: widget.builders[_i]())),
     ]);
   }
 }

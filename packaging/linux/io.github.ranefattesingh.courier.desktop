@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Courier
+GenericName=API Client
+Comment=Test HTTP, GraphQL, gRPC, WebSocket, Socket.IO, MQTT, SSE, SOAP and Kafka APIs
+Exec=courier-api %U
+Icon=io.github.ranefattesingh.courier
+Terminal=false
+Categories=Development;Network;
+Keywords=api;rest;http;graphql;grpc;websocket;socketio;mqtt;kafka;soap;sse;
+StartupWMClass=courier
+StartupNotify=true

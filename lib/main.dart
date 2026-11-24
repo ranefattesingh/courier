@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'state/app_state.dart';
 import 'ui/home.dart';
 import 'ui/theme.dart';
+import 'ui/widgets/motion.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,7 @@ class _CourierAppState extends State<CourierApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final dark = context.select<AppState, bool>((s) => s.settings.darkMode);
+    Motion.enabled = context.select<AppState, bool>((s) => s.settings.animations);
     return MaterialApp(
       title: 'Courier',
       debugShowCheckedModeBanner: false,

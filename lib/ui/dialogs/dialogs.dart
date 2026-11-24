@@ -526,6 +526,12 @@ Future<void> showSettingsDialog(BuildContext context, AppState state) async {
       ], builders: [
         () => ListView(padding: const EdgeInsets.all(16), children: [
               SwitchListTile(title: const Text('Dark theme'), value: s.darkMode, onChanged: (v) => upd(() => s.darkMode = v)),
+              SwitchListTile(
+                title: const Text('Animations'),
+                subtitle: const Text('Subtle transitions when expanding folders and switching tabs. Also turned off automatically when your system asks for reduced motion.'),
+                value: s.animations,
+                onChanged: (v) => upd(() => s.animations = v),
+              ),
               FieldRow(
                 'Request / response layout',
                 Align(
