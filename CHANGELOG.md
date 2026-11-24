@@ -2,6 +2,11 @@
 
 All notable changes to Courier are listed here. Each release on GitHub uses the matching section below.
 
+## [1.0.2]
+
+### Fixed
+- Choosing an action from the **⋯** button on a collection, folder or request in the sidebar (Duplicate, Delete, Rename, Add request and so on) now works. Before, only the right-click menu applied the action.
+
 ## [1.0.1]
 
 ### New

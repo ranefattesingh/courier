@@ -169,7 +169,11 @@ class _TreeRow extends StatefulWidget {
 class _TreeRowState extends State<_TreeRow> {
   bool _hover = false;
 
-  Future<void> _menu(BuildContext context, Offset? at) async {
+  /// Opens the row's action menu at [pos] (global coordinates). Actions always run with the
+  /// row's own context: the ⋯ button that may have opened the menu only exists while the row
+  /// is hovered, and the menu covering the row ends the hover, so its context is gone by the
+  /// time an item is picked.
+  Future<void> _menu(Offset pos) async {
     final state = context.read<AppState>();
     final n = widget.node;
     final isFolder = n is Folder;
@@ -198,8 +202,6 @@ class _TreeRowState extends State<_TreeRow> {
       const PopupMenuDivider(),
       PopupMenuItem(value: 'delete', height: 30, child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error))),
     ];
-    final box = context.findRenderObject() as RenderBox;
-    final pos = at ?? box.localToGlobal(Offset(box.size.width - 30, box.size.height));
     final v = await showMenu<String>(context: context, position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx + 1, pos.dy + 1), items: items);
     if (v == null || !context.mounted) return;
     if (v.startsWith('add:')) {
@@ -273,7 +275,11 @@ class _TreeRowState extends State<_TreeRow> {
         if (_hover)
           Builder(
             builder: (bctx) => InkWell(
-              onTap: () => _menu(bctx, null),
+              onTap: () {
+                // Open the menu just below the ⋯ button.
+                final box = bctx.findRenderObject()! as RenderBox;
+                _menu(box.localToGlobal(Offset(0, box.size.height)));
+              },
               child: Padding(padding: const EdgeInsets.all(4), child: Icon(Icons.more_horiz, size: 16, color: cs.onSurfaceVariant)),
             ),
           ),
@@ -296,7 +302,7 @@ class _TreeRowState extends State<_TreeRow> {
         },
         // No double-tap handler here: it would delay every single click by ~300 ms while
         // Flutter waits to rule out a double click. Rename is in the context menu.
-        onSecondaryTapDown: (d) => _menu(context, d.globalPosition),
+        onSecondaryTapDown: (d) => _menu(d.globalPosition),
         child: content,
       ),
     );
