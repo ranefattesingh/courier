@@ -14,6 +14,7 @@ import 'editors/request_editor.dart';
 import 'sidebar.dart';
 import 'theme.dart';
 import 'widgets/common.dart';
+import 'widgets/motion.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -145,11 +146,14 @@ class _TopBar extends StatelessWidget {
       child: Row(children: [
         IconButton(tooltip: 'Toggle sidebar', iconSize: 18, icon: const Icon(Icons.view_sidebar_outlined), onPressed: onToggleSidebar),
         const SizedBox(width: 4),
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(6)),
-          child: const Icon(Icons.send_rounded, size: 14, color: onAccent),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: Image.asset(
+            Theme.of(context).brightness == Brightness.dark ? 'assets/icons/courier_dark.png' : 'assets/icons/courier_light.png',
+            width: 26,
+            height: 26,
+            filterQuality: FilterQuality.medium,
+          ),
         ),
         const SizedBox(width: 8),
         const Text('Courier', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
@@ -340,7 +344,7 @@ IconButton(
                     ),
                 ]),
               )
-            : RequestEditor(key: ObjectKey(tab), tab: tab),
+            : FadeIn(key: ObjectKey(tab), child: RequestEditor(tab: tab)),
       ),
     ]);
   }
@@ -374,11 +378,13 @@ class _TabChipState extends State<_TabChip> {
           child: GestureDetector(
             onTap: widget.onTap,
             onTertiaryTapUp: (_) => widget.onClose(),
-            child: Container(
+            child: AnimatedContainer(
+              duration: Motion.of(context, Motion.fast),
+              curve: Curves.easeOut,
               width: 200,
               padding: const EdgeInsets.only(left: 10, right: 4),
               decoration: BoxDecoration(
-                color: widget.selected ? cs.surface : (_hover ? cs.surfaceContainer : null),
+                color: widget.selected ? cs.surface : (_hover ? cs.surfaceContainer : cs.surfaceContainer.withValues(alpha: 0)),
                 border: Border(
                   top: BorderSide(color: widget.selected ? cs.primary : Colors.transparent, width: 2),
                   right: BorderSide(color: cs.outlineVariant),

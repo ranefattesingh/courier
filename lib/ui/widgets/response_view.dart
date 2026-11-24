@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../models/models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'motion.dart';
 
 /// Response pane for request/response protocols (HTTP, GraphQL, SOAP, gRPC unary).
 class ResponseView extends StatefulWidget {
@@ -27,6 +28,12 @@ class _ResponseViewState extends State<ResponseView> {
 
   @override
   Widget build(BuildContext context) {
+    // Fade in when the pane changes state (empty → loading → a new response), not on every rebuild.
+    final key = widget.loading ? 'loading' : widget.response == null ? 'empty' : 'r${identityHashCode(widget.response)}';
+    return FadeIn(key: ValueKey(key), ms: Motion.normal, child: _content(context));
+  }
+
+  Widget _content(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     if (widget.loading) {
       return Center(

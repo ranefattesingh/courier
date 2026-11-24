@@ -1,0 +1,35 @@
+# Binary RPM spec for the prebuilt Flutter bundle. Placeholders (@...@) are filled in
+# by build-packages.sh; build with that script rather than rpmbuild directly.
+%global debug_package %{nil}
+%global __strip /bin/true
+%global _build_id_links none
+# Dependencies are declared explicitly so the RPM can be built on any distro.
+AutoReqProv: no
+
+Name:           @PKG@
+Version:        @VERSION@
+Release:        1
+Summary:        @SUMMARY@
+License:        MIT
+URL:            @HOMEPAGE@
+BuildArch:      x86_64
+Requires:       gtk3
+Requires:       libglvnd-egl
+Requires:       libglvnd-gles
+
+%description
+Courier is a free, open-source, local-first API client. Organise requests in
+collections and nested folders, switch environments, and test REST, GraphQL,
+gRPC, WebSocket, Socket.IO, MQTT, Server-Sent Events, SOAP and Kafka with every
+common authentication scheme. No account or cloud sync required.
+
+%install
+mkdir -p %{buildroot}
+cp -a @STAGE@/. %{buildroot}/
+
+%files
+%license /usr/share/doc/@PKG@/copyright
+/opt/@PKG@
+/usr/bin/@PKG@
+/usr/share/applications/@APP_ID@.desktop
+/usr/share/icons/hicolor/*/apps/@APP_ID@.png
