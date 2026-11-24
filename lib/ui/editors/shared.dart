@@ -11,6 +11,15 @@ import '../widgets/auth_editor.dart';
 import '../widgets/common.dart';
 import 'actions.dart';
 
+/// Request/response split direction chosen in settings: stacked (vertical) or side by side.
+Axis paneAxis(AppState s) => s.settings.responsePane == 'right' ? Axis.horizontal : Axis.vertical;
+
+/// Request/response split that follows the user's layout preference.
+Widget requestResponseSplit(EditorCtx ctx, {required Widget request, required Widget response, double initial = 0.5}) {
+  final axis = paneAxis(ctx.state);
+  return SplitView(key: ValueKey('split-$axis'), axis: axis, initial: initial, min: 0.2, first: request, second: response);
+}
+
 /// Convenience bundle passed to all editors.
 class EditorCtx {
   final AppState state;

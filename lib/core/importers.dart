@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:yaml/yaml.dart';
+
 import '../models/models.dart';
+import 'import_insomnia.dart';
 
 class ImportResult {
   final List<Folder> collections;
@@ -10,28 +13,61 @@ class ImportResult {
   bool get isEmpty => collections.isEmpty && environments.isEmpty && requests.isEmpty;
 }
 
+/// Supported formats, shown in the import dialog.
+const supportedImportFormats = [
+  'Courier export (.json)',
+  'Postman Collection v1, v2.0, v2.1',
+  'Postman Environment',
+  'Postman data dump (Settings → Export data)',
+  'Insomnia export v4 (.json)',
+  'Insomnia v5 collection / environment (.yaml / .json)',
+  'cURL command',
+];
+
 /// Detects the format of [text] and imports it.
 ImportResult importAny(String text) {
   final t = text.trim();
-  if (t.startsWith('curl ') || t.startsWith('curl\t') || t.startsWith('curl\n')) {
+  if (t.isEmpty) throw const FormatException('Nothing to import');
+  if (RegExp(r'^curl(\s|$)').hasMatch(t)) {
     return ImportResult(requests: [parseCurl(t)]);
   }
-  final dynamic j;
+  dynamic j;
   try {
     j = jsonDecode(t);
   } catch (_) {
-    throw const FormatException('Unrecognised format. Paste a cURL command or a Postman / Courier JSON export.');
+    try {
+      j = yamlToPlain(loadYaml(t));
+    } catch (_) {
+      j = null;
+    }
   }
-  if (j is! Map) throw const FormatException('Expected a JSON object');
+  if (j is! Map) {
+    throw const FormatException('Unrecognised format. Paste a cURL command, or a Postman / Insomnia / Courier export (JSON or YAML).');
+  }
   if (j['courierExport'] != null) return importCourier(Map<String, dynamic>.from(j));
+  if (isInsomniaV4(j)) return importInsomniaV4(j);
+  if (isInsomniaV5(j)) return importInsomniaV5(j);
   if (j['info'] is Map && j['item'] is List) return ImportResult(collections: [importPostmanCollection(Map<String, dynamic>.from(j))]);
   if (j['collection'] is Map) {
     return ImportResult(collections: [importPostmanCollection(Map<String, dynamic>.from(j['collection'] as Map))]);
   }
+  if (j['requests'] is List && (j['order'] is List || j['folders'] is List || j['name'] != null)) {
+    return ImportResult(collections: [importPostmanV1(j)]);
+  }
+  if (j['collections'] is List && (j['version'] != null || j['environments'] is List)) return importPostmanDump(j);
   if (j['values'] is List && j['name'] != null) return ImportResult(environments: [importPostmanEnvironment(j)]);
   if (j['environment'] is Map) return ImportResult(environments: [importPostmanEnvironment(j['environment'] as Map)]);
-  throw const FormatException('Unrecognised JSON. Supported: Postman Collection v2.0/v2.1, Postman Environment, Courier export.');
+  throw const FormatException('Unrecognised JSON. Supported: Postman (v1/v2.0/v2.1, environments, data dumps), Insomnia (v4/v5), Courier, cURL.');
 }
+
+/// Converts parsed YAML nodes into plain Dart maps/lists.
+dynamic yamlToPlain(dynamic y) {
+  if (y is YamlMap) return {for (final e in y.entries) e.key.toString(): yamlToPlain(e.value)};
+  if (y is YamlList) return [for (final e in y) yamlToPlain(e)];
+  return y;
+}
+
+List<KV> parseQueryParamsLoose(String url) => _queryFromUrl(url);
 
 // ---------------------------------------------------------------------------- Courier native
 
@@ -273,6 +309,153 @@ Map<String, dynamic> exportPostmanCollection(Folder c) {
     if (_pmAuthOut(c.auth) != null) 'auth': _pmAuthOut(c.auth),
     'variable': c.variables.map((v) => {'key': v.key, 'value': v.value}).toList(),
   };
+}
+
+// ---------------------------------------------------------------------------- Postman v1 & data dump
+
+String _pmV1Lang(String raw, List<KV> headers) {
+  final ct = headers.where((h) => h.key.toLowerCase() == 'content-type').map((h) => h.value.toLowerCase()).firstOrNull ?? '';
+  if (ct.contains('json')) return 'json';
+  if (ct.contains('xml')) return 'xml';
+  if (ct.contains('html')) return 'html';
+  final t = raw.trimLeft();
+  if (t.startsWith('{') || t.startsWith('[')) return 'json';
+  if (t.startsWith('<')) return 'xml';
+  return 'text';
+}
+
+ApiRequest _pmV1Request(Map m) {
+  final r = ApiRequest(id: newId(), name: m['name']?.toString() ?? 'Request');
+  r.method = (m['method']?.toString() ?? 'GET').toUpperCase();
+  r.url = m['url']?.toString() ?? '';
+  r.description = _desc(m['description']);
+  r.params = _queryFromUrl(r.url);
+  if (m['headerData'] is List && (m['headerData'] as List).isNotEmpty) {
+    r.headers = _pmKv(m['headerData']);
+  } else {
+    for (final line in (m['headers']?.toString() ?? '').split('\n')) {
+      final i = line.indexOf(':');
+      if (i <= 0) continue;
+      final disabled = line.startsWith('//');
+      r.headers.add(KV(key: line.substring(disabled ? 2 : 0, i).trim(), value: line.substring(i + 1).trim(), enabled: !disabled));
+    }
+  }
+  List<KV> data() => (m['data'] as List? ?? [])
+      .whereType<Map>()
+      .map((e) => KV(key: e['key']?.toString() ?? '', value: e['value']?.toString() ?? '', enabled: e['enabled'] != false, type: e['type'] == 'file' ? 'file' : 'text'))
+      .toList();
+  switch (m['dataMode']) {
+    case 'raw':
+      final raw = m['rawModeData']?.toString() ?? '';
+      if (raw.isNotEmpty) {
+        r.body.mode = 'raw';
+        r.body.raw = raw;
+        r.body.rawLang = _pmV1Lang(raw, r.headers);
+      }
+    case 'params':
+      if (data().isNotEmpty) {
+        r.body.mode = 'form-data';
+        r.body.formData = data();
+      }
+    case 'urlencoded':
+      if (data().isNotEmpty) {
+        r.body.mode = 'urlencoded';
+        r.body.urlEncoded = data();
+      }
+    case 'binary':
+      r.body.mode = 'binary';
+  }
+  final helper = m['currentHelper']?.toString();
+  final attrs = m['helperAttributes'] is Map ? m['helperAttributes'] as Map : const {};
+  String a(String k) => attrs[k]?.toString() ?? '';
+  switch (helper) {
+    case 'basicAuth':
+      r.auth = AuthConfig(type: 'basic', p: {'username': a('username'), 'password': a('password')});
+    case 'digestAuth':
+      r.auth = AuthConfig(type: 'digest', p: {'username': a('username'), 'password': a('password'), 'realm': a('realm'), 'nonce': a('nonce'), 'algorithm': a('algorithm'), 'qop': a('qop'), 'opaque': a('opaque')});
+    case 'bearerAuth':
+      r.auth = AuthConfig(type: 'bearer', p: {'token': a('token')});
+    case 'oAuth1':
+      r.auth = AuthConfig(type: 'oauth1', p: {
+        'consumerKey': a('consumerKey'),
+        'consumerSecret': a('consumerSecret'),
+        'token': a('token'),
+        'tokenSecret': a('tokenSecret'),
+        'signatureMethod': attrs['signatureMethod']?.toString() ?? 'HMAC-SHA1',
+      });
+    case 'awsSigV4':
+      r.auth = AuthConfig(type: 'awsv4', p: {'accessKey': a('accessKey'), 'secretKey': a('secretKey'), 'region': a('region'), 'service': a('service')});
+    case 'hawkAuth':
+      r.auth = AuthConfig(type: 'hawk', p: {'authId': a('hawk_id'), 'authKey': a('hawk_key'), 'algorithm': attrs['algorithm']?.toString() ?? 'sha256'});
+  }
+  if (r.body.rawLang == 'xml' && r.body.raw.contains(':Envelope')) {
+    r.type = RequestType.soap;
+    r.opts['soapVersion'] = r.body.raw.contains('2003/05/soap-envelope') ? '1.2' : '1.1';
+  }
+  return r;
+}
+
+/// Postman Collection v1 (the original Postman Chrome-app format).
+Folder importPostmanV1(Map j) {
+  final requests = {for (final r in (j['requests'] as List? ?? []).whereType<Map>()) r['id'].toString(): r};
+  final folders = {for (final f in (j['folders'] as List? ?? []).whereType<Map>()) f['id'].toString(): f};
+  final usedRequests = <String>{};
+  final nestedFolders = <String>{for (final f in folders.values) ...(f['folders_order'] as List? ?? []).map((e) => e.toString())};
+  final col = Folder(id: newId(), name: j['name']?.toString() ?? 'Imported Collection', description: _desc(j['description']), auth: AuthConfig(type: 'none'), expanded: true);
+  col.variables = _pmKv(j['variables'] ?? j['variable']);
+
+  Folder buildFolder(Map f, Set<String> seen) {
+    final folder = Folder(id: newId(), name: f['name']?.toString() ?? 'Folder', description: _desc(f['description']));
+    for (final sub in (f['folders_order'] as List? ?? []).map((e) => e.toString())) {
+      final sf = folders[sub];
+      if (sf != null && !seen.contains(sub)) folder.children.add(buildFolder(sf, {...seen, sub}));
+    }
+    for (final id in (f['order'] as List? ?? []).map((e) => e.toString())) {
+      final r = requests[id];
+      if (r != null) {
+        usedRequests.add(id);
+        folder.children.add(_pmV1Request(r));
+      }
+    }
+    return folder;
+  }
+
+  final topFolderIds = (j['folders_order'] as List?)?.map((e) => e.toString()).toList() ??
+      folders.keys.where((id) => !nestedFolders.contains(id)).toList();
+  for (final id in topFolderIds) {
+    final f = folders[id];
+    if (f != null) col.children.add(buildFolder(f, {id}));
+  }
+  for (final id in (j['order'] as List? ?? []).map((e) => e.toString())) {
+    final r = requests[id];
+    if (r != null && usedRequests.add(id)) col.children.add(_pmV1Request(r));
+  }
+  for (final e in requests.entries) {
+    if (usedRequests.add(e.key)) col.children.add(_pmV1Request(e.value));
+  }
+  return col;
+}
+
+/// Postman "Export data" dump: { version, collections: [v1 or v2], environments: [...], globals: [...] }
+ImportResult importPostmanDump(Map j) {
+  final cols = <Folder>[];
+  for (final c in (j['collections'] as List? ?? []).whereType<Map>()) {
+    if (c['info'] is Map && c['item'] is List) {
+      cols.add(importPostmanCollection(Map<String, dynamic>.from(c)));
+    } else {
+      cols.add(importPostmanV1(c));
+    }
+  }
+  final envs = (j['environments'] as List? ?? []).whereType<Map>().map(importPostmanEnvironment).toList();
+  final globals = j['globals'];
+  if (globals is List && globals.isNotEmpty) {
+    envs.add(Environment(
+      id: newId(),
+      name: 'Postman Globals',
+      variables: globals.whereType<Map>().map((v) => KV(key: v['key']?.toString() ?? '', value: v['value']?.toString() ?? '', enabled: v['enabled'] != false)).toList(),
+    ));
+  }
+  return ImportResult(collections: cols, environments: envs);
 }
 
 // ---------------------------------------------------------------------------- cURL

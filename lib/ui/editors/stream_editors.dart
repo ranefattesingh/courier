@@ -9,10 +9,11 @@ import 'shared.dart';
 
 /// Compose panel + message log layout shared by streaming protocols.
 Widget _streamLayout(EditorCtx ctx, {required List<String> labels, required List<Widget Function()> builders, required String emptyText}) =>
-    SplitView(
+    requestResponseSplit(
+      ctx,
       initial: 0.48,
-      first: SimpleTabs(key: ValueKey('st${ctx.tab.id}${ctx.r.type}'), labels: labels, builders: builders),
-      second: MessageLog(messages: ctx.tab.logs, onClear: () => {ctx.tab.logs.clear(), ctx.tab.touch()}, emptyText: emptyText),
+      request: SimpleTabs(key: ValueKey('st${ctx.tab.id}${ctx.r.type}'), labels: labels, builders: builders),
+      response: MessageLog(messages: ctx.tab.logs, onClear: () => {ctx.tab.logs.clear(), ctx.tab.touch()}, emptyText: emptyText),
     );
 
 Widget _composer(EditorCtx ctx, {required Widget actions, String language = 'json', String hint = 'Compose message'}) => Builder(

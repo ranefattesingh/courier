@@ -233,11 +233,11 @@ Future<void> showImportDialog(BuildContext context, AppState state) async {
             width: 640,
             height: 420,
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('Supported: Postman Collection v2.0/v2.1, Postman Environment, Courier export (.json), cURL command.', style: TextStyle(fontSize: 12)),
+              Text('Supported: ${supportedImportFormats.join(' · ')}', style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: () async {
-                  final files = await openFiles(acceptedTypeGroups: const [XTypeGroup(label: 'JSON / text', extensions: ['json', 'txt', 'sh', 'curl'])]);
+                  final files = await openFiles(acceptedTypeGroups: const [XTypeGroup(label: 'JSON / YAML / text', extensions: ['json', 'yaml', 'yml', 'txt', 'sh', 'curl'])]);
                   for (final f in files) {
                     doImport(await f.readAsString());
                     if (error != null) break;
@@ -256,7 +256,7 @@ Future<void> showImportDialog(BuildContext context, AppState state) async {
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,
                   style: mono(ctx, size: 12),
-                  decoration: const InputDecoration(hintText: "curl -X GET 'https://api.example.com'  or  { \"info\": …, \"item\": [ … ] }"),
+                  decoration: const InputDecoration(hintText: "curl -X GET 'https://api.example.com'\n\nor paste a Postman / Insomnia / Courier export (JSON or YAML)"),
                 ),
               ),
               if (error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(error!, style: TextStyle(color: Theme.of(ctx).colorScheme.error, fontSize: 12))),
@@ -291,6 +291,101 @@ Future<void> _saveJson(BuildContext context, String name, Object data) async {
   if (loc == null) return;
   await XFile.fromData(Uint8List.fromList(utf8.encode(const JsonEncoder.withIndent('  ').convert(data))), mimeType: 'application/json').saveTo(loc.path);
   if (context.mounted) toast(context, 'Exported to ${loc.path}');
+}
+
+/// Courier export or Postman v2.1. Postman's format only represents HTTP-family requests.
+Future<void> showExportDialog(BuildContext context, AppState state, {Folder? initial}) async {
+  String scope = initial?.id ?? 'all';
+  String format = 'courier';
+  bool includeEnvs = true;
+  int countUnsupported(Folder f) => f.children.fold(0, (n, c) {
+        if (c is Folder) return n + countUnsupported(c);
+        final r = c as ApiRequest;
+        return n + (r.type == RequestType.http || r.type == RequestType.graphql || r.type == RequestType.soap ? 0 : 1);
+      });
+  await showDialog(
+    context: context,
+    builder: (ctx) => StatefulBuilder(builder: (ctx, set) {
+      final cs = Theme.of(ctx).colorScheme;
+      final selected = scope == 'all' ? state.collections : state.collections.where((c) => c.id == scope).toList();
+      final unsupported = selected.fold<int>(0, (n, c) => n + countUnsupported(c));
+      return AlertDialog(
+        title: const Text('Export', style: TextStyle(fontSize: 16)),
+        content: SizedBox(
+          width: 520,
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const Text('What to export', style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 6),
+            CompactDropdown<String>(
+              width: 480,
+              value: scope,
+              items: {'all': 'All collections (${state.collections.length})', for (final c in state.collections) c.id: c.name},
+              onChanged: (v) => set(() => scope = v),
+            ),
+            const SizedBox(height: 14),
+            const Text('Format', style: TextStyle(fontSize: 12)),
+            RadioListTile<String>(
+              value: 'courier',
+              groupValue: format,
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Courier JSON'),
+              subtitle: const Text('Full fidelity: every protocol, auth, tests, variables and folders. Re-import into Courier.'),
+              onChanged: (v) => set(() => format = v!),
+            ),
+            RadioListTile<String>(
+              value: 'postman',
+              groupValue: format,
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Postman Collection v2.1 JSON'),
+              subtitle: const Text('Importable by Postman, Insomnia and most API tools. One file per collection.'),
+              onChanged: (v) => set(() => format = v!),
+            ),
+            if (format == 'courier')
+              CheckboxListTile(
+                value: includeEnvs,
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                title: Text('Include environments (${state.environments.length}) and globals'),
+                onChanged: (v) => set(() => includeEnvs = v ?? true),
+              ),
+            if (format == 'postman' && unsupported > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text('$unsupported request(s) use protocols Postman\'s collection format cannot hold (gRPC, WebSocket, Socket.IO, MQTT, SSE, Kafka) and will be left out. Use Courier JSON to keep them.',
+                    style: TextStyle(fontSize: 12, color: cs.error)),
+              ),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: selected.isEmpty
+                ? null
+                : () async {
+                    Navigator.pop(ctx);
+                    if (format == 'postman') {
+                      for (final c in selected) {
+                        await exportCollection(context, c, postman: true);
+                      }
+                    } else if (scope == 'all') {
+                      await _saveJson(context, 'courier-export.json', exportCourier(
+                        collections: selected,
+                        environments: includeEnvs ? [...state.environments, if (state.globals.isNotEmpty) Environment(id: newId(), name: 'Globals', variables: state.globals)] : [],
+                      ));
+                    } else {
+                      final c = selected.single;
+                      await _saveJson(context, '${c.name.replaceAll(RegExp(r'[^\w\- ]'), '_')}.courier.json',
+                          exportCourier(collections: [c], environments: includeEnvs ? state.environments : []));
+                    }
+                  },
+            child: const Text('Export'),
+          ),
+        ],
+      );
+    }),
+  );
 }
 
 // ============================================================================ Folder / Collection settings
@@ -431,6 +526,21 @@ Future<void> showSettingsDialog(BuildContext context, AppState state) async {
       ], builders: [
         () => ListView(padding: const EdgeInsets.all(16), children: [
               SwitchListTile(title: const Text('Dark theme'), value: s.darkMode, onChanged: (v) => upd(() => s.darkMode = v)),
+              FieldRow(
+                'Request / response layout',
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: SegmentedButton<String>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(value: 'bottom', icon: Icon(Icons.view_agenda_outlined, size: 16), label: Text('Stacked (response below)')),
+                      ButtonSegment(value: 'right', icon: Icon(Icons.view_column_outlined, size: 16), label: Text('Side by side (response right)')),
+                    ],
+                    selected: {s.responsePane},
+                    onSelectionChanged: (v) => upd(() => s.responsePane = v.first),
+                  ),
+                ),
+              ),
               SwitchListTile(title: const Text('SSL certificate verification'), value: s.verifySsl, onChanged: (v) => upd(() => s.verifySsl = v)),
               SwitchListTile(title: const Text('Automatically follow redirects'), value: s.followRedirects, onChanged: (v) => upd(() => s.followRedirects = v)),
               SwitchListTile(title: const Text('Send no-cache header'), value: s.sendNoCacheHeader, onChanged: (v) => upd(() => s.sendNoCacheHeader = v)),

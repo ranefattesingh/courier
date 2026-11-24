@@ -188,6 +188,8 @@ class _TopBar extends StatelessWidget {
         const SizedBox(width: 8),
         OutlinedButton(onPressed: () => showImportDialog(context, state), child: const Text('Import')),
         const SizedBox(width: 8),
+        OutlinedButton(onPressed: () => showExportDialog(context, state), child: const Text('Export')),
+        const SizedBox(width: 8),
         OutlinedButton.icon(onPressed: () => showRunner(context, state), icon: const Icon(Icons.play_arrow, size: 16), label: const Text('Runner')),
         const Spacer(),
         CompactDropdown<String>(
@@ -204,14 +206,14 @@ class _TopBar extends StatelessWidget {
           tooltip: 'Workspace',
           icon: const Icon(Icons.more_vert, size: 18),
           itemBuilder: (_) => const [
-            PopupMenuItem(value: 'export', height: 32, child: Text('Export workspace (all collections & environments)')),
+            PopupMenuItem(value: 'export', height: 32, child: Text('Export collections…')),
             PopupMenuItem(value: 'paste', height: 32, child: Text('Import cURL from clipboard')),
             PopupMenuItem(value: 'shortcuts', height: 32, child: Text('Keyboard shortcuts')),
           ],
           onSelected: (v) async {
             switch (v) {
               case 'export':
-                await exportWorkspace(context, state);
+                await showExportDialog(context, state);
               case 'paste':
                 final d = await Clipboard.getData('text/plain');
                 try {
@@ -288,6 +290,12 @@ class _EditorArea extends StatelessWidget {
                 );
               },
             ),
+          ),
+IconButton(
+            tooltip: state.settings.responsePane == 'right' ? 'Response on the right — switch to stacked view' : 'Response below — switch to side-by-side view',
+            iconSize: 18,
+            icon: Icon(state.settings.responsePane == 'right' ? Icons.view_column_outlined : Icons.view_agenda_outlined),
+            onPressed: () => state.updateSettings((s) => s.responsePane = s.responsePane == 'right' ? 'bottom' : 'right'),
           ),
           IconButton(tooltip: 'New tab', iconSize: 18, icon: const Icon(Icons.add), onPressed: () => state.newTab(RequestType.http)),
           PopupMenuButton<String>(
@@ -423,6 +431,18 @@ class _StatusBar extends StatelessWidget {
         const Spacer(),
         Text('${state.collections.length} collections · ${state.environments.length} environments · ${state.history.length} history',
             style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
+        const SizedBox(width: 12),
+        Tooltip(
+          message: 'Toggle request/response layout',
+          child: InkWell(
+            onTap: () => state.updateSettings((s) => s.responsePane = s.responsePane == 'right' ? 'bottom' : 'right'),
+            child: Row(children: [
+              Icon(state.settings.responsePane == 'right' ? Icons.view_column_outlined : Icons.view_agenda_outlined, size: 14, color: cs.onSurfaceVariant),
+              const SizedBox(width: 4),
+              Text(state.settings.responsePane == 'right' ? 'Side by side' : 'Stacked', style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
+            ]),
+          ),
+        ),
         const SizedBox(width: 12),
         InkWell(
           onTap: () => state.updateSettings((s) => s.darkMode = !s.darkMode),

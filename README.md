@@ -33,8 +33,13 @@ Auth can be set on a collection or folder and inherited by everything inside it.
 - **Variable capture** from JSON path / header / regex / status into environment, collection or global variables. This chains requests together.
 - **Collection Runner**: iterations, delay, stop on failure, pass/fail summary. Runs HTTP, GraphQL, SOAP and gRPC unary requests.
 - History, Console (full request/response log), Cookie manager, Code snippets (cURL, HTTP, Python, JS fetch, Node axios, Go, C#, Java, PowerShell).
-- Import: Postman Collection v2.0/v2.1, Postman Environment, Courier export, cURL. Export: Courier JSON and Postman v2.1.
-- Settings: SSL verification, redirects, timeouts, proxy (system/custom with auth), custom CA certificate, client certificate (mTLS), theme (dark/light), editor font size.
+- **Import** (file upload or paste; JSON or YAML auto-detected):
+  - Postman: Collection v1 (classic Chrome app), v2.0, v2.1, Environments, full data dumps (Settings → Export data, including globals)
+  - Insomnia: v4 JSON export and v5 YAML/JSON collections and environment files. Covers folders, auth, all body types, GraphQL, gRPC (with proto files), WebSocket, and base/sub-environments. `{{ _.var }}`, `{% uuid %}` and `{% now %}` templates are converted, and folder headers are applied to the requests inside.
+  - Courier JSON exports and cURL commands
+- **Export** (top bar **Export**, sidebar ↑ icon, or a collection's `⋯` menu): one collection or all, as **Courier JSON** (every protocol, optionally with environments and globals) or **Postman Collection v2.1 JSON** (HTTP, GraphQL and SOAP requests; the dialog says how many other requests will be left out).
+- **Layout**: show the response **below** the request (stacked) or **to the right** (side by side). Switch with the layout button in the tab bar, the status bar, or Settings → General. The choice is remembered.
+- Settings: SSL verification, redirects, timeouts, proxy (system/custom with auth), custom CA certificate, client certificate (mTLS), theme (dark/light), request/response layout, editor font size.
 
 Keyboard shortcuts (`⌘` on macOS): `Ctrl+Enter` send/connect, `Ctrl+S` save, `Ctrl+T` new tab, `Ctrl+W` close tab, `Ctrl+O` import, `Ctrl+Tab` next tab.
 
