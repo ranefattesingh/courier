@@ -4,7 +4,7 @@ import 'package:courier/main.dart';
 import 'package:courier/models/models.dart';
 import 'package:courier/state/app_state.dart';
 import 'package:courier/ui/widgets/common.dart';
-import 'package:flutter/gestures.dart' show kSecondaryButton;
+import 'package:flutter/gestures.dart' show PointerDeviceKind, kSecondaryButton;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -141,6 +141,29 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(Dialog), findsNothing);
+
+    // The ⋯ button (shown on hover) runs the chosen action too, not just right-click.
+    // Regression: the button disappeared when the menu covered the row, and the action was dropped.
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: tester.getCenter(find.text('Users Service')));
+    addTearDown(mouse.removePointer);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.more_horiz).first);
+    await tester.pumpAndSettle();
+    await mouse.moveTo(tester.getCenter(find.text('Duplicate')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Duplicate'));
+    await tester.pumpAndSettle();
+    expect(find.text('Users Service Copy'), findsOneWidget);
+    await tester.tap(find.text('Users Service Copy'), buttons: kSecondaryButton);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Users Service Copy'), findsNothing);
+    await mouse.moveTo(Offset.zero);
+    await tester.pumpAndSettle();
 
     // Request/response layout: stacked by default, toggle to side by side and back.
     SplitView split() => tester.widget<SplitView>(find.byType(SplitView).first);
