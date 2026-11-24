@@ -40,3 +40,24 @@ Description: Desktop API client for HTTP, GraphQL, gRPC, WebSocket, MQTT, Kafka 
  gRPC, WebSocket, Socket.IO, MQTT, Server-Sent Events, SOAP and Kafka with every
  common authentication scheme. No account or cloud sync required.
 
+Package: courier-api
+Architecture: amd64
+Version: 1.0.2
+Priority: optional
+Section: devel
+Maintainer: Fattesingh Rane <41385129+ranefattesingh@users.noreply.github.com>
+Installed-Size: 30304
+Depends: libgtk-3-0t64 | libgtk-3-0, libegl1, libgles2
+Filename: pool/main/courier-api_1.0.2_amd64.deb
+Size: 9164444
+MD5sum: bde1c50fcfe6a78025a7f8f5f5463526
+SHA1: c5a9bbe300d6f39546de59ba5f46805dbfc28371
+SHA256: 9d2cebe744432db77aae9a11e9ab7535003a3508a602a8a3a6ef2869ab403d2b
+SHA512: 0f5edb673ba1b2bd88996911048990587c209fea0959856a1d2ca9b679b8193f275f4664c9b585ec2a9b9e12eb9e62b7cf45d8d38f65df9b592c7657bbaf4069
+Homepage: https://github.com/ranefattesingh/courier
+Description: Desktop API client for HTTP, GraphQL, gRPC, WebSocket, MQTT, Kafka and more
+ Courier is a free, open-source, local-first API client. Organise requests in
+ collections and nested folders, switch environments, and test REST, GraphQL,
+ gRPC, WebSocket, Socket.IO, MQTT, Server-Sent Events, SOAP and Kafka with every
+ common authentication scheme. No account or cloud sync required.
+
