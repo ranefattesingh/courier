@@ -140,6 +140,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
     env:
       HAS_KEY: ${{ secrets.LINUX_REPO_GPG_KEY != '' }}
     steps:
@@ -164,6 +167,7 @@ jobs:
             || (mkdir site && git -C site init -b gh-pages && git -C site remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git")
           BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
           packaging/linux/publish-repos.sh pkgs site "$KEY_ID" "$BASE"
+          packaging/publish-website.sh site
           cd site
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -173,6 +177,37 @@ jobs:
       - name: Skipped
         if: env.HAS_KEY != 'true'
         run: echo "LINUX_REPO_GPG_KEY secret not set; apt/dnf repositories were not published."
+
+  # Website (landing page + docs from website/) on GitHub Pages, next to the apt/dnf repositories.
+  # Runs on every push to main, so documentation changes go live without a release.
+  website:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish website to gh-pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git clone --depth 1 --branch gh-pages "$REMOTE" site \
+            || (mkdir site && git -C site init -b gh-pages && git -C site remote add origin "$REMOTE")
+          packaging/publish-website.sh site
+          cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Website unchanged."
+          else
+            git commit -m "Update website from ${GITHUB_SHA::7}"
+            git push origin gh-pages
+          fi
 
   # Homebrew cask in https://github.com/<owner>/homebrew-tap.
   # One-time setup: create that repo and add secret HOMEBREW_TAP_TOKEN (see README → Releasing).

@@ -4,6 +4,8 @@ A local-first API testing tool for **Windows, macOS (Apple Silicon + Intel) and 
 Classic API-client workflow: collections → folders → requests, tabs, environments, history.
 No accounts, no sign-in, no cloud sync. Everything stays on your machine.
 
+**Website and documentation: https://ranefattesingh.github.io/courier/**
+
 ## Install
 
 Downloads for every platform are on the [Releases page](https://github.com/ranefattesingh/courier/releases/latest).
@@ -115,6 +117,18 @@ to produce the `.deb`, the tarball and (if `rpmbuild` is installed) the `.rpm` i
 
 **App icon**: edit `assets/icons/courier_dark.png` / `courier_light.png` (ideally 1024×1024), then run
 `python3 tool/generate_icons.py` (needs `pip install pillow`) to regenerate the macOS, Windows and Linux icons.
+
+## Website
+
+The website and user guide live in [`website/`](website/): plain HTML, CSS and JavaScript with no build step.
+Preview it with `python3 -m http.server -d website 8000` and open http://localhost:8000.
+Every push to `main` publishes it to GitHub Pages (the `website` job in the workflow), alongside the apt and dnf repositories.
+
+The screenshots are rendered from the real app, sending real requests to local test servers:
+```bash
+flutter test tool/screenshots/screenshots_test.dart   # → build/screenshots/*.png
+python3 tool/screenshots/optimize.py                  # → website/img/*.webp (needs Pillow)
+```
 
 ## Releasing
 

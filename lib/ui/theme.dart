@@ -60,7 +60,10 @@ ThemeData buildTheme(bool dark) {
       hintStyle: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.7), fontSize: 13),
     ),
     tooltipTheme: const TooltipThemeData(waitDuration: Duration(milliseconds: 500)),
-    popupMenuTheme: PopupMenuThemeData(color: scheme.surfaceContainerHigh, textStyle: TextStyle(fontSize: 13, color: scheme.onSurface)),
+    popupMenuTheme: PopupMenuThemeData(
+      color: scheme.surfaceContainerHigh,
+      textStyle: base.textTheme.bodyMedium!.copyWith(fontSize: 13, color: scheme.onSurface),
+    ),
     dialogTheme: DialogThemeData(backgroundColor: scheme.surfaceContainer),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

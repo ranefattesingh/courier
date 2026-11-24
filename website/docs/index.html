@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Courier documentation</title>
+  <meta name="description" content="How to install and use Courier, the free open-source API client: requests, collections, environments, every protocol, authentication, tests, the runner, import and export.">
+  <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Courier documentation">
+  <meta property="og:description" content="How to install and use Courier, the free open-source API client.">
+  <meta property="og:image" content="https://ranefattesingh.github.io/courier/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script>try{var t=localStorage.getItem("courier-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../">
+      <img class="only-light" src="../assets/icon-light.png" alt="" width="30" height="30">
+      <img class="only-dark" src="../assets/icon-dark.png" alt="" width="30" height="30">
+      Courier
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="../#features">Features</a>
+      <a class="hide-sm" href="../#install">Install</a>
+      <a href="./" aria-current="page">Docs</a>
+      <a href="https://github.com/ranefattesingh/courier">GitHub</a>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark theme" title="Switch theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs">
+  <aside class="toc">
+    <details>
+      <summary>On this page</summary>
+      <nav aria-label="Documentation">
+        <div class="group">Getting started</div>
+        <a href="#install">Install</a>
+        <a href="#first-request">Your first request</a>
+        <a href="#window">A tour of the window</a>
+        <div class="group">Organise</div>
+        <a href="#collections">Collections and folders</a>
+        <a href="#environments">Environments and variables</a>
+        <a href="#history">History, cookies and console</a>
+        <div class="group">Protocols</div>
+        <a href="#http">HTTP / REST</a>
+        <a href="#graphql">GraphQL</a>
+        <a href="#grpc">gRPC</a>
+        <a href="#websocket">WebSocket</a>
+        <a href="#socketio">Socket.IO</a>
+        <a href="#mqtt">MQTT</a>
+        <a href="#sse">Server-Sent Events</a>
+        <a href="#soap">SOAP</a>
+        <a href="#kafka">Kafka</a>
+        <div class="group">Auth and automation</div>
+        <a href="#auth">Authentication</a>
+        <a href="#tests">Tests</a>
+        <a href="#capture">Chaining requests</a>
+        <a href="#runner">Collection Runner</a>
+        <a href="#codegen">Code snippets</a>
+        <div class="group">Reference</div>
+        <a href="#import-export">Import and export</a>
+        <a href="#settings">Settings</a>
+        <a href="#shortcuts">Keyboard shortcuts</a>
+        <a href="#data">Where your data lives</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#uninstall">Uninstall</a>
+      </nav>
+    </details>
+  </aside>
+
+  <main class="doc">
+    <h1>Courier documentation</h1>
+    <p class="intro">Courier is a free, open-source desktop app for testing APIs. This guide covers installing it, sending your first request, and every feature after that. Each section stands on its own, so jump to whatever you need.</p>
+
+    <!-- ============================================================ GETTING STARTED -->
+    <section id="install">
+      <h2>Install <a class="anchor" href="#install" aria-label="Link to this section">#</a></h2>
+      <p>Courier runs on Windows 10/11, macOS 12 or newer (Apple Silicon and Intel), and 64-bit Linux. The <a href="../#install">install page</a> has buttons and copyable commands for each system. In short:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>System</th><th>How to install</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td>Download and run <code>Courier-Setup-<span data-version>1.0.0</span>-x64.exe</code> from the <a href="https://github.com/ranefattesingh/courier/releases/latest">latest release</a>.</td></tr>
+          <tr><td>macOS</td><td><code>brew install --cask ranefattesingh/tap/courier</code>, or download the .zip.</td></tr>
+          <tr><td>Ubuntu / Debian</td><td>Add the apt repository, then <code>sudo apt install courier-api</code>.</td></tr>
+          <tr><td>Fedora / RHEL</td><td>Add the dnf repository, then <code>sudo dnf install courier-api</code>.</td></tr>
+          <tr><td>Other Linux</td><td>Extract <code>courier-linux-x64.tar.gz</code> and run <code>courier</code>.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><strong>Why “courier-api” on Linux?</strong> Debian and Fedora already have packages called <code>courier</code> (a mail server), so Courier’s Linux package and command are named <code>courier-api</code>. The app itself is still called Courier in your menu.</div>
+    </section>
+
+    <section id="first-request">
+      <h2>Your first request <a class="anchor" href="#first-request" aria-label="Link to this section">#</a></h2>
+      <p>Courier opens with a <b>Sample API Collection</b> so you can try things straight away. To send a request of your own:</p>
+      <ol class="steps">
+        <li>Click <b>+ New</b> in the top bar and choose <b>HTTP</b>. A new tab opens.</li>
+        <li>Pick a method (<code>GET</code> is selected) and type a URL, for example <code>https://httpbin.org/get?name=courier</code>. The <b>Params</b> table fills in as you type.</li>
+        <li>Click <b>Send</b> or press <kbd>Ctrl</kbd> <kbd>Enter</kbd> (<kbd>⌘</kbd> <kbd>Enter</kbd> on a Mac).</li>
+        <li>The response appears with its status, time and size. Switch between <b>Pretty</b> and <b>Raw</b>, or look at <b>Headers</b> and <b>Cookies</b>.</li>
+        <li>Press <kbd>Ctrl</kbd> <kbd>S</kbd> to save the request into a collection so you can find it again.</li>
+      </ol>
+      <figure>
+        <div class="shot">
+          <img class="only-light" src="../img/http-light.webp" width="1440" height="900" loading="lazy" alt="A saved GET request with query parameters and its JSON response">
+          <img class="only-dark" src="../img/http-dark.webp" width="1440" height="900" loading="lazy" alt="A saved GET request with query parameters and its JSON response">
+        </div>
+        <figcaption>A saved request: the URL uses the <code>{{baseUrl}}</code> variable, and the response shows 3 of 3 tests passing.</figcaption>
+      </figure>
+    </section>
+
+    <section id="window">
+      <h2>A tour of the window <a class="anchor" href="#window" aria-label="Link to this section">#</a></h2>
+      <ul>
+        <li><b>Top bar</b>: <b>+ New</b>, <b>Import</b>, <b>Export</b> and <b>Runner</b> on the left. On the right, the environment picker, then buttons for a variables quick look (eye), cookies, the console and settings.</li>
+        <li><b>Sidebar</b>: switch between <b>Collections</b>, <b>Environments</b> and <b>History</b>. Hide it with the panel button at the top left.</li>
+        <li><b>Tabs</b>: every open request has a tab. A dot means unsaved changes. Use the layout button at the right of the tab strip to show the response <b>below</b> the request or <b>beside</b> it.</li>
+        <li><b>Request editor</b>: the URL bar and tabs such as Params, Authorization, Headers, Body, Tests, Settings and Docs. Each protocol has its own set.</li>
+        <li><b>Response panel</b>: the result of the request, or a live message log for connections like WebSocket.</li>
+        <li><b>Status bar</b>: active connections on the left; counts, the layout switch and the theme switch on the right.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ ORGANISE -->
+    <section id="collections">
+      <h2>Collections and folders <a class="anchor" href="#collections" aria-label="Link to this section">#</a></h2>
+      <p>A <b>collection</b> groups the requests for one project or service. Inside it, you can create <b>folders</b> and sub-folders as deep as you like, for example one folder per microservice and a sub-folder per resource.</p>
+      <ul>
+        <li><b>Create</b>: <b>+ New → Collection</b>, or the <b>+</b> at the top of the sidebar. Add folders from a collection’s right-click menu.</li>
+        <li><b>Act on anything</b>: right-click an item, or use its <b>⋯</b> button, to open, rename, duplicate, export or delete it.</li>
+        <li><b>Move and reorder</b>: drag requests and folders to a new place.</li>
+        <li><b>Find</b>: type in the sidebar search box to filter the tree. Matching folders open automatically.</li>
+        <li><b>Shared settings</b>: <b>Edit collection</b> sets auth and collection variables for everything inside. <b>Edit folder</b> sets auth for that folder. Requests set to <b>Inherit auth from parent</b> use the nearest folder’s auth.</li>
+      </ul>
+    </section>
+
+    <section id="environments">
+      <h2>Environments and variables <a class="anchor" href="#environments" aria-label="Link to this section">#</a></h2>
+      <p>Variables let you write a value once and use it everywhere. Write <code>{{name}}</code> in a URL, header, body, auth field or message. Courier highlights it <span style="color:var(--ok)">green</span> when it’s defined and red when it isn’t.</p>
+      <h3>Environments</h3>
+      <p>An <b>environment</b> is a named set of variables, such as <i>Development</i>, <i>Staging</i> and <i>Production</i>, each with its own <code>baseUrl</code> and token. Pick the active one in the top bar, and every request switches over.</p>
+      <ul>
+        <li>Open the <b>Environments</b> section of the sidebar to add, edit, rename, export or delete environments.</li>
+        <li>Mark sensitive values as <b>secret</b> (the lock icon) to mask them on screen.</li>
+        <li><b>Globals</b> are variables available everywhere, whatever environment is active.</li>
+        <li>Click the eye icon in the top bar to see every variable the current request can use and where it comes from.</li>
+      </ul>
+      <figure>
+        <div class="shot"><img src="../img/environments.webp" width="1440" height="900" loading="lazy" alt="The Development environment with a baseUrl variable and a masked token"></div>
+        <figcaption>Editing an environment. The token is marked secret, so it’s masked.</figcaption>
+      </figure>
+      <h3>Which value wins</h3>
+      <p>If the same name is defined in several places, the most specific one is used:</p>
+      <p><b>Global</b> &lt; <b>Collection</b> &lt; <b>Environment</b> &lt; values captured during a run.</p>
+      <h3>Dynamic variables</h3>
+      <p>These generate a fresh value every time a request is sent. Useful for unique IDs and test data.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Variable</th><th>Example value</th></tr></thead>
+        <tbody>
+          <tr><td><code>{{$guid}}</code>, <code>{{$randomUUID}}</code></td><td>3f2b8c1e-9d4a-4e6b-a0f1-7c5e2d9b8a10</td></tr>
+          <tr><td><code>{{$timestamp}}</code></td><td>Unix time in seconds, e.g. 1764000000</td></tr>
+          <tr><td><code>{{$timestampMs}}</code></td><td>Unix time in milliseconds</td></tr>
+          <tr><td><code>{{$isoTimestamp}}</code></td><td>2026-11-24T10:30:00.000Z (UTC)</td></tr>
+          <tr><td><code>{{$randomInt}}</code></td><td>A whole number from 0 to 1000</td></tr>
+          <tr><td><code>{{$randomBoolean}}</code></td><td>true or false</td></tr>
+          <tr><td><code>{{$randomFirstName}}</code>, <code>{{$randomLastName}}</code>, <code>{{$randomFullName}}</code></td><td>Mia, Patel, Mia Patel</td></tr>
+          <tr><td><code>{{$randomUserName}}</code></td><td>mia412</td></tr>
+          <tr><td><code>{{$randomEmail}}</code></td><td>mia.patel@example.com</td></tr>
+          <tr><td><code>{{$randomPhoneNumber}}</code></td><td>555-123-4567</td></tr>
+          <tr><td><code>{{$randomCity}}</code></td><td>Lisbon</td></tr>
+          <tr><td><code>{{$randomIP}}</code></td><td>192.168.10.42</td></tr>
+          <tr><td><code>{{$randomPrice}}</code></td><td>421.37</td></tr>
+          <tr><td><code>{{$randomWord}}</code>, <code>{{$randomWords}}</code></td><td>orbit, orbit ember pixel</td></tr>
+          <tr><td><code>{{$randomColor}}</code>, <code>{{$randomHexColor}}</code></td><td>teal, #3fa2c4</td></tr>
+          <tr><td><code>{{$randomHex}}</code>, <code>{{$randomAlphaNumeric}}</code></td><td>16 hex characters, 1 character</td></tr>
+          <tr><td><code>{{$randomPassword}}</code></td><td>15 random characters</td></tr>
+          <tr><td><code>{{$randomDateFuture}}</code>, <code>{{$randomDatePast}}</code></td><td>A date within a year from now, or before now</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="history">
+      <h2>History, cookies and console <a class="anchor" href="#history" aria-label="Link to this section">#</a></h2>
+      <ul>
+        <li><b>History</b> (sidebar) lists every request you send, grouped by day. Click one to open it again. You can search it or clear it.</li>
+        <li><b>Cookies</b> (cookie icon in the top bar): cookies set by servers are stored and sent back automatically, like a browser. View, add or delete them here, or turn this off in Settings.</li>
+        <li><b>Console</b> (terminal icon): a log of every request sent, with the final URL, headers, body, status and timing. Handy when something doesn’t behave as expected.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ PROTOCOLS -->
+    <section id="http">
+      <h2>HTTP / REST <a class="anchor" href="#http" aria-label="Link to this section">#</a></h2>
+      <ul>
+        <li><b>Methods</b>: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, TRACE and CONNECT.</li>
+        <li><b>Params</b>: query parameters stay in sync with the URL in both directions.</li>
+        <li><b>Headers</b>: add your own; the dropdown on the key field suggests common headers.</li>
+        <li><b>Body</b>: none, <b>form-data</b> (text fields and files), <b>x-www-form-urlencoded</b>, <b>raw</b> (JSON, XML, HTML, JavaScript or text, with a Beautify button), <b>binary</b> (send a file), or <b>GraphQL</b>.</li>
+        <li><b>Paste cURL</b>: paste a cURL command into the URL bar and it becomes a full request.</li>
+        <li><b>Settings</b> tab: override SSL verification, redirects and the timeout for this request only.</li>
+        <li><b>Docs</b> tab: write notes for the request.</li>
+      </ul>
+      <p><b>Bulk Edit</b> above any key/value table switches to a text view with one <code>key:value</code> per line. Prefix a line with <code>//</code> to disable it.</p>
+      <h3>Reading the response</h3>
+      <ul>
+        <li><b>Body</b>: <b>Pretty</b> formats and colours JSON, XML and HTML; <b>Raw</b> shows the exact text; images are previewed. Search with the find box, toggle line wrapping, copy, or save to a file from the <b>⋯</b> menu.</li>
+        <li><b>Cookies</b> and <b>Headers</b> returned by the server.</li>
+        <li><b>Test Results</b>: which of your tests passed. See <a href="#tests">Tests</a>.</li>
+        <li><b>Request</b>: exactly what was sent, after variables and auth were applied.</li>
+      </ul>
+    </section>
+
+    <section id="graphql">
+      <h2>GraphQL <a class="anchor" href="#graphql" aria-label="Link to this section">#</a></h2>
+      <p>Create a <b>GraphQL</b> request, enter the endpoint, and write your query on the left with <b>variables</b> as JSON underneath. Add an operation name if the document has several operations.</p>
+      <ul>
+        <li><b>Schema</b>: click <b>Fetch</b> to load the schema with introspection. Browse types and fields, and click <b>Generate operation</b> to write a query for you.</li>
+        <li><b>Subscriptions</b>: start the query with <code>subscription</code>, or use a <code>ws://</code> / <code>wss://</code> URL. Courier connects over WebSocket (both <code>graphql-transport-ws</code> and the older <code>graphql-ws</code> protocol) and shows each event as it arrives.</li>
+      </ul>
+      <figure>
+        <div class="shot"><img src="../img/graphql.webp" width="1440" height="900" loading="lazy" alt="A GraphQL query with variables and its JSON response"></div>
+        <figcaption>A GraphQL query with variables, and the response beside it.</figcaption>
+      </figure>
+    </section>
+
+    <section id="grpc">
+      <h2>gRPC <a class="anchor" href="#grpc" aria-label="Link to this section">#</a></h2>
+      <p>Courier calls gRPC services directly. There’s no code to generate and nothing else to install.</p>
+      <ol class="steps">
+        <li>Enter the server address, such as <code>localhost:50051</code>. The lock button next to it switches between TLS and plaintext; addresses starting with <code>grpcs://</code> use TLS automatically.</li>
+        <li>Load the service definition in one of two ways:
+          <ul>
+            <li><b>Use server reflection</b>: click <b>Load methods via reflection</b>. Works when the server has reflection turned on.</li>
+            <li><b>Use .proto files</b>: click <b>Import .proto files</b> and pick one or more files. Imports between them, nested types, maps, oneofs, enums and Google’s well-known types are supported.</li>
+          </ul>
+        </li>
+        <li>Choose a method. Click <b>Generate example</b> to fill in a sample message, then edit the JSON.</li>
+        <li>Click <b>Invoke</b>. For streaming methods, click <b>Invoke stream</b>, then <b>Send message</b> as often as you need and <b>End streaming</b> when done.</li>
+      </ol>
+      <p>Add <b>metadata</b> (gRPC headers) in the Metadata tab. The response shows the message as JSON, plus response metadata and trailers.</p>
+    </section>
+
+    <section id="websocket">
+      <h2>WebSocket <a class="anchor" href="#websocket" aria-label="Link to this section">#</a></h2>
+      <p>Enter a <code>ws://</code> or <code>wss://</code> URL and click <b>Connect</b>. Add headers, query params, auth and sub-protocols before connecting if the server needs them.</p>
+      <p>Write a message as <b>Text</b>, <b>JSON</b>, <b>XML</b>, <b>HTML</b> or <b>Binary (Base64)</b> and click <b>Send</b>. The message log on the right shows sent (↑) and received (↓) messages with timestamps. Filter or search the log, copy any message, or download the whole log.</p>
+      <figure>
+        <div class="shot"><img src="../img/websocket.webp" width="1440" height="900" loading="lazy" alt="A connected WebSocket with sent and echoed messages in the log"></div>
+        <figcaption>A WebSocket connection to an echo server.</figcaption>
+      </figure>
+    </section>
+
+    <section id="socketio">
+      <h2>Socket.IO <a class="anchor" href="#socketio" aria-label="Link to this section">#</a></h2>
+      <p>Works with Socket.IO v4 servers. Enter the server URL (include a namespace path like <code>/chat</code> if needed) and click <b>Connect</b>.</p>
+      <ul>
+        <li>In the connection settings, set the <b>Handshake path</b> (default <code>/socket.io</code>), a <b>Handshake auth</b> JSON payload, and the <b>Transport</b>: WebSocket only, polling with upgrade, or long-polling only.</li>
+        <li>To send, enter an <b>Event name</b> and payload and click <b>Send</b>. Turn on <b>Ack</b> to wait for the server’s acknowledgement.</li>
+        <li>Every event the server emits appears in the log, whatever its name.</li>
+      </ul>
+    </section>
+
+    <section id="mqtt">
+      <h2>MQTT <a class="anchor" href="#mqtt" aria-label="Link to this section">#</a></h2>
+      <p>Connect to an MQTT 3.1.1 broker using <code>mqtt://</code>, <code>mqtts://</code>, <code>ws://</code> or <code>wss://</code>, for example <code>mqtt://test.mosquitto.org:1883</code>.</p>
+      <ul>
+        <li>Connection options: <b>Client ID</b>, username and password, <b>Keep alive</b>, <b>Clean session</b>, and an optional <b>Last-will</b> topic and message.</li>
+        <li>Add one or more <b>topic filters</b> (wildcards <code>+</code> and <code>#</code> work), each with its own QoS. Messages on those topics appear in the log.</li>
+        <li>To publish, set the <b>Publish topic</b>, QoS and <b>Retain</b>, write the payload and click <b>Publish</b>.</li>
+      </ul>
+    </section>
+
+    <section id="sse">
+      <h2>Server-Sent Events <a class="anchor" href="#sse" aria-label="Link to this section">#</a></h2>
+      <p>Enter the stream URL and click <b>Connect</b>. Each event appears in the log with its <code>event</code>, <code>id</code> and <code>data</code> fields.</p>
+      <p>Unlike a browser, Courier can open the stream with any method and a body. That’s how streaming LLM APIs work: choose <code>POST</code>, add your API key header, and put the JSON request in the body.</p>
+    </section>
+
+    <section id="soap">
+      <h2>SOAP <a class="anchor" href="#soap" aria-label="Link to this section">#</a></h2>
+      <ul>
+        <li>Create a <b>SOAP</b> request, choose <b>SOAP 1.1</b> or <b>1.2</b>, and set the <b>SOAPAction</b> if the service needs one.</li>
+        <li><b>Load WSDL</b> from a URL or a file to get a list of operations. Picking one fills in a ready-to-edit envelope.</li>
+        <li>For WS-Security, choose <b>WSS UsernameToken</b> with <b>PasswordText</b> or <b>PasswordDigest</b> and enter the credentials. Courier adds the security header for you.</li>
+      </ul>
+    </section>
+
+    <section id="kafka">
+      <h2>Kafka <a class="anchor" href="#kafka" aria-label="Link to this section">#</a></h2>
+      <p>Courier talks to Kafka brokers directly. You don’t need Java or the Kafka command-line tools.</p>
+      <ol class="steps">
+        <li>Enter the <b>bootstrap servers</b>, for example <code>localhost:9092</code> or <code>broker1:9092,broker2:9092</code>.</li>
+        <li>If the cluster is secured, open the connection settings and choose the <b>Security protocol</b> (PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL) and the <b>SASL mechanism</b> (PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512).</li>
+        <li>Pick a topic, or click <b>List topics</b> to choose from the cluster.</li>
+      </ol>
+      <h3>Producing</h3>
+      <p>Write the message value, and optionally a <b>key</b>, <b>record headers</b> and a <b>partition</b>. Choose the <b>acks</b> level and click <b>Produce</b>. Without a partition, Courier picks one from the key the same way the standard Java client does, so records with the same key land together. Turn on <b>Send null value when empty</b> to send tombstone records for compacted topics.</p>
+      <h3>Consuming</h3>
+      <p>Choose where to start: <b>Earliest</b>, <b>Latest</b> (new messages only) or a <b>specific offset</b>, optionally on one partition. Records stream into the log until you click <b>Stop consuming</b>. Courier reads without joining a consumer group, so it never moves your applications’ committed offsets.</p>
+      <div class="note"><strong>Compressed messages</strong> Gzip-compressed batches are decoded. Batches compressed with snappy, lz4 or zstd are listed with a notice instead of their contents.</div>
+      <figure>
+        <div class="shot"><img src="../img/kafka.webp" width="1440" height="900" loading="lazy" alt="The Kafka editor with a topic, key and JSON message ready to produce"></div>
+        <figcaption>Producing a JSON message with a key that uses a dynamic variable.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ AUTH & AUTOMATION -->
+    <section id="auth">
+      <h2>Authentication <a class="anchor" href="#auth" aria-label="Link to this section">#</a></h2>
+      <p>Pick a type in the <b>Authorization</b> tab. Courier adds the right headers or parameters when the request is sent; you can check them in the response’s <b>Request</b> tab. All fields accept <code>{{variables}}</code>, so keep secrets in an environment.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Type</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Inherit from parent</td><td>Uses the auth set on the nearest folder or collection. This is the default for saved requests.</td></tr>
+          <tr><td>API Key</td><td>Adds a key as a header or a query parameter.</td></tr>
+          <tr><td>Bearer Token</td><td>Sends <code>Authorization: Bearer &lt;token&gt;</code>.</td></tr>
+          <tr><td>Basic</td><td>Username and password, Base64-encoded.</td></tr>
+          <tr><td>Digest</td><td>Answers the server’s challenge automatically. MD5 and SHA-256, including <code>-sess</code> and <code>auth-int</code>.</td></tr>
+          <tr><td>OAuth 1.0</td><td>Signs requests with HMAC-SHA1/256/512 or PLAINTEXT, in the header, query or body.</td></tr>
+          <tr><td>OAuth 2.0</td><td>Authorization Code (with or without PKCE), Implicit, Password, Client Credentials and Refresh Token.</td></tr>
+          <tr><td>Hawk</td><td>Hawk request signing.</td></tr>
+          <tr><td>AWS Signature v4</td><td>Signs requests for AWS services, in the header or as a presigned URL.</td></tr>
+          <tr><td>NTLM</td><td>NTLMv2 challenge and response, for Windows-authenticated services.</td></tr>
+          <tr><td>Akamai EdgeGrid</td><td>Signs requests to Akamai APIs.</td></tr>
+          <tr><td>JWT Bearer</td><td>Creates and signs a JWT (HS, RS, PS or ES with 256/384/512) and sends it as a bearer token.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Getting an OAuth 2.0 token</h3>
+      <ol class="steps">
+        <li>Choose <b>OAuth 2.0</b> and a <b>Grant Type</b>. Fill in the Auth URL, Access Token URL, Client ID and Scope from your provider.</li>
+        <li>Register the <b>Callback URL</b> shown in Courier (default <code>http://localhost:7777/callback</code>) with your provider.</li>
+        <li>Click <b>Get New Access Token</b>. For browser-based grants, Courier opens your browser, waits on the callback URL for the sign-in to finish, and fills in the token.</li>
+      </ol>
+      <figure>
+        <div class="shot"><img src="../img/auth.webp" width="1440" height="900" loading="lazy" alt="OAuth 2.0 settings with the Authorization Code with PKCE grant type"></div>
+        <figcaption>OAuth 2.0 with PKCE. The client ID comes from an environment variable.</figcaption>
+      </figure>
+    </section>
+
+    <section id="tests">
+      <h2>Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
+      <p>The <b>Tests</b> tab checks each response automatically, without writing code. Click <b>Add assertion</b> and choose what to check and how.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Check</th><th>Compares</th></tr></thead>
+        <tbody>
+          <tr><td>Status code</td><td>The HTTP status, e.g. equals <code>200</code>.</td></tr>
+          <tr><td>Response time (ms)</td><td>How long the request took, e.g. less than <code>500</code>.</td></tr>
+          <tr><td>Header</td><td>The value of a response header you name.</td></tr>
+          <tr><td>Body text</td><td>The whole response body as text.</td></tr>
+          <tr><td>JSON body path</td><td>A value found with a JSON path (see below).</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Operators</b>: equals, not equals, contains, does not contain, exists, does not exist, less than, greater than, matches regex, and is type (<code>string</code>, <code>number</code>, <code>boolean</code>, <code>array</code>, <code>object</code> or <code>null</code>).</p>
+      <h3>JSON paths</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Path</th><th>Finds</th></tr></thead>
+        <tbody>
+          <tr><td><code>$.data.id</code></td><td>The <code>id</code> field inside <code>data</code>.</td></tr>
+          <tr><td><code>$.users[0].email</code></td><td>The first user’s email.</td></tr>
+          <tr><td><code>$.users[*].id</code></td><td>Every user’s id.</td></tr>
+          <tr><td><code>$..name</code></td><td>Every <code>name</code> field at any depth.</td></tr>
+          <tr><td><code>$.users.length</code></td><td>How many users there are.</td></tr>
+        </tbody>
+      </table></div>
+      <figure>
+        <div class="shot"><img src="../img/tests.webp" width="1440" height="900" loading="lazy" alt="Test Results showing three passing assertions"></div>
+        <figcaption>Three assertions on status, list length and a field value, all passing.</figcaption>
+      </figure>
+    </section>
+
+    <section id="capture">
+      <h2>Chaining requests <a class="anchor" href="#capture" aria-label="Link to this section">#</a></h2>
+      <p>Use <b>Set variables from response</b> in the Tests tab to save part of a response into a variable, then use it in later requests. For example, log in once and reuse the token everywhere.</p>
+      <ul>
+        <li><b>Take the value from</b> a JSON path, a header, a regular expression on the body (the first capture group), or the status code.</li>
+        <li><b>Save it to</b> the active environment, the collection, or the globals.</li>
+      </ul>
+      <p>Example: capture <code>$.token</code> from <i>POST /login</i> into <code>token</code>, then set later requests to <b>Bearer Token</b> with <code>{{token}}</code>.</p>
+    </section>
+
+    <section id="runner">
+      <h2>Collection Runner <a class="anchor" href="#runner" aria-label="Link to this section">#</a></h2>
+      <p>The runner sends every request in a collection or folder, in order, and reports the results. Open it with <b>Runner</b> in the top bar, or from a folder’s menu.</p>
+      <ul>
+        <li>Choose the collection or folder, untick requests you want to skip, and set the number of <b>Iterations</b> and a <b>Delay</b> between requests.</li>
+        <li>Turn on <b>Stop run on first failure</b> to stop as soon as a request or test fails.</li>
+        <li>Variables captured by one request are available to the next, so login-then-call flows work.</li>
+        <li>The runner handles HTTP, GraphQL, SOAP and unary gRPC requests. Streaming connections are skipped.</li>
+      </ul>
+      <figure>
+        <div class="shot"><img src="../img/runner.webp" width="1440" height="900" loading="lazy" alt="Runner results: 2 requests passed, 3 of 3 tests"></div>
+        <figcaption>A run over the Users Service folder: 2 requests, 0 failures.</figcaption>
+      </figure>
+    </section>
+
+    <section id="codegen">
+      <h2>Code snippets <a class="anchor" href="#codegen" aria-label="Link to this section">#</a></h2>
+      <p>Click <b>Code</b> above the URL bar to turn the current request into code you can paste into a script or a terminal: <b>cURL</b>, raw <b>HTTP</b>, <b>Python</b> (requests), <b>JavaScript</b> (fetch), <b>Node.js</b> (axios), <b>Go</b>, <b>C#</b>, <b>Java</b> and <b>PowerShell</b>. Variables and auth are already filled in.</p>
+    </section>
+
+    <!-- ============================================================ REFERENCE -->
+    <section id="import-export">
+      <h2>Import and export <a class="anchor" href="#import-export" aria-label="Link to this section">#</a></h2>
+      <h3>Import</h3>
+      <p>Click <b>Import</b> (or press <kbd>Ctrl</kbd> <kbd>O</kbd>), then choose a file or paste text. Courier works out the format by itself.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>From</th><th>What’s supported</th></tr></thead>
+        <tbody>
+          <tr><td>Postman</td><td>Collections v1, v2.0 and v2.1; environment files; full data dumps (<i>Settings → Data → Export data</i> in Postman), including globals.</td></tr>
+          <tr><td>Insomnia</td><td>v4 exports (JSON) and v5 collections and environments (YAML or JSON). Folders, auth, bodies, GraphQL, gRPC with proto files, and WebSocket requests come across. Insomnia template tags such as <code>{{ _.var }}</code>, <code>{% uuid %}</code> and <code>{% now %}</code> are converted.</td></tr>
+          <tr><td>cURL</td><td>Paste a <code>curl</code> command and it becomes a request.</td></tr>
+          <tr><td>Courier</td><td>Files exported from Courier, including environments and globals.</td></tr>
+        </tbody>
+      </table></div>
+      <figure>
+        <div class="shot"><img src="../img/import.webp" width="1440" height="900" loading="lazy" alt="The Import dialog"></div>
+      </figure>
+      <h3>Export</h3>
+      <p>Click <b>Export</b> in the top bar, the export icon in the sidebar, or <b>Export…</b> in a collection’s menu. Choose one collection or all of them, and a format:</p>
+      <ul>
+        <li><b>Courier JSON</b>: everything, for every protocol. Optionally include environments and globals. Use this for backups and for sharing with other Courier users.</li>
+        <li><b>Postman Collection v2.1</b>: HTTP, GraphQL and SOAP requests, to open in Postman or other tools. The dialog tells you how many requests of other types will be left out.</li>
+      </ul>
+    </section>
+
+    <section id="settings">
+      <h2>Settings <a class="anchor" href="#settings" aria-label="Link to this section">#</a></h2>
+      <p>Open Settings with the gear icon in the top bar.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Section</th><th>Options</th></tr></thead>
+        <tbody>
+          <tr><td>General</td><td>Dark theme; animations; request/response layout (stacked or side by side); SSL certificate verification; follow redirects and the maximum number; request timeout; send a <code>no-cache</code> header; keep cookies automatically; how many history entries to keep; editor font size.</td></tr>
+          <tr><td>Proxy</td><td>No proxy, the system proxy, or a custom proxy with host, port and optional username and password.</td></tr>
+          <tr><td>Certificates</td><td>An extra <b>CA certificate</b> (PEM) to trust self-signed or company certificates, and a <b>client certificate</b> with its private key and passphrase for mutual TLS.</td></tr>
+        </tbody>
+      </table></div>
+      <p>The SSL, redirect and timeout settings can be overridden for a single request in that request’s <b>Settings</b> tab.</p>
+      <div class="note"><strong>Animations</strong> Courier uses short, subtle animations. Turn them off in Settings → General. They also switch off by themselves when your system’s “reduce motion” setting is on.</div>
+    </section>
+
+    <section id="shortcuts">
+      <h2>Keyboard shortcuts <a class="anchor" href="#shortcuts" aria-label="Link to this section">#</a></h2>
+      <p>On macOS, use <kbd>⌘</kbd> wherever this table says <kbd>Ctrl</kbd>. Switching tabs uses <kbd>Ctrl</kbd> on every system.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Ctrl</kbd> <kbd>Enter</kbd></td><td>Send the request, or connect/disconnect</td></tr>
+          <tr><td><kbd>Ctrl</kbd> <kbd>S</kbd></td><td>Save the request</td></tr>
+          <tr><td><kbd>Ctrl</kbd> <kbd>T</kbd></td><td>New HTTP request tab</td></tr>
+          <tr><td><kbd>Ctrl</kbd> <kbd>W</kbd></td><td>Close the current tab</td></tr>
+          <tr><td><kbd>Ctrl</kbd> <kbd>O</kbd></td><td>Import</td></tr>
+          <tr><td><kbd>Ctrl</kbd> <kbd>Tab</kbd> / <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Tab</kbd></td><td>Next / previous tab</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="data">
+      <h2>Where your data lives <a class="anchor" href="#data" aria-label="Link to this section">#</a></h2>
+      <p>Courier saves automatically as you work. Nothing is sent anywhere: your data stays in a folder on your computer.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>System</th><th>Folder</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td><code>%APPDATA%\Fattesingh Rane\Courier\courier\</code></td></tr>
+          <tr><td>macOS</td><td><code>~/Library/Containers/io.github.ranefattesingh.courier/Data/Library/Application Support/io.github.ranefattesingh.courier/courier/</code></td></tr>
+          <tr><td>Linux</td><td><code>~/.local/share/io.github.ranefattesingh.courier/courier/</code></td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><code>workspace.json</code>: collections, environments, globals and cookies.</li>
+        <li><code>settings.json</code>: your settings.</li>
+        <li><code>history.json</code>: request history.</li>
+        <li><code>tabs.json</code>: open tabs, including unsaved changes.</li>
+      </ul>
+      <p><b>Backing up</b>: export your collections as Courier JSON with environments included, or copy the folder above while Courier is closed.</p>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Troubleshooting <a class="anchor" href="#troubleshooting" aria-label="Link to this section">#</a></h2>
+      <h3>Windows says “Windows protected your PC”</h3>
+      <p>The installer isn’t code-signed yet, so SmartScreen doesn’t recognise it. Click <b>More info</b>, then <b>Run anyway</b>.</p>
+      <h3>macOS says Courier can’t be opened</h3>
+      <p>The app isn’t notarized by Apple yet. Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> next to the Courier message. You only need to do this once.</p>
+      <h3>A request fails with a certificate error</h3>
+      <p>The server probably uses a self-signed or company certificate. Add that CA under <b>Settings → Certificates</b> (best), or turn off SSL verification for that one request in its <b>Settings</b> tab.</p>
+      <h3>Requests time out at work</h3>
+      <p>Your network may require a proxy. Try <b>Settings → Proxy → Use system proxy</b>, or enter the proxy details yourself.</p>
+      <h3>A variable shows in red</h3>
+      <p>It isn’t defined anywhere Courier can see it. Check the spelling, check that the right environment is selected in the top bar, and use the eye icon to see every variable that’s available.</p>
+      <h3>OAuth 2.0 sign-in never finishes</h3>
+      <p>Make sure the Callback URL registered with your provider exactly matches the one in Courier, including the port, and that no other program is using that port.</p>
+      <h3>Something else</h3>
+      <p>Open the <b>Console</b> to see exactly what was sent and received. If it still looks wrong, <a href="https://github.com/ranefattesingh/courier/issues">open an issue</a> with the steps to reproduce it.</p>
+    </section>
+
+    <section id="uninstall">
+      <h2>Uninstall <a class="anchor" href="#uninstall" aria-label="Link to this section">#</a></h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>System</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td><b>Settings → Apps → Installed apps</b>, find Courier, then <b>Uninstall</b>.</td></tr>
+          <tr><td>macOS (Homebrew)</td><td><code>brew uninstall --cask courier</code>. Add <code>--zap</code> to remove your data too.</td></tr>
+          <tr><td>macOS (zip)</td><td>Drag Courier from Applications to the Bin.</td></tr>
+          <tr><td>Ubuntu / Debian</td><td><code>sudo apt remove courier-api</code></td></tr>
+          <tr><td>Fedora / RHEL</td><td><code>sudo dnf remove courier-api</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Uninstalling keeps your collections and settings in case you come back. To remove them, delete the folder listed in <a href="#data">Where your data lives</a>.</p>
+      <div class="pager">
+        <a href="../">← Courier home</a>
+        <a href="https://github.com/ranefattesingh/courier">Source code on GitHub →</a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <p><b>Courier</b> · Free and open source under the MIT License.</p>
+      <p>Courier is an independent project and is not affiliated with Postman, Inc., Kong Inc. (Insomnia) or courier.com.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="../">Home</a>
+      <a href="https://github.com/ranefattesingh/courier/releases">Releases</a>
+      <a href="https://github.com/ranefattesingh/courier/issues">Report a bug</a>
+      <a href="https://github.com/ranefattesingh/courier">Source code</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>

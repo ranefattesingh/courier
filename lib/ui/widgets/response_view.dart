@@ -166,7 +166,10 @@ class _ResponseViewState extends State<ResponseView> {
           child: Row(
             children: [
               SegmentedButton<String>(
-                style: const ButtonStyle(visualDensity: VisualDensity.compact, textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 12))),
+                style: ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  textStyle: WidgetStatePropertyAll(Theme.of(context).textTheme.labelLarge!.copyWith(fontSize: 12)),
+                ),
                 showSelectedIcon: false,
                 segments: [
                   const ButtonSegment(value: 'pretty', label: Text('Pretty')),

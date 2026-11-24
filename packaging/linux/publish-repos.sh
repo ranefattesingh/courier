@@ -69,21 +69,6 @@ repo_gpgcheck=1
 gpgkey=$BASE/courier.gpg
 EOF
 
-# ---------------------------------------------------------------- landing page
-cat > "$SITE/index.html" <<EOF
-<!doctype html><meta charset="utf-8"><title>Courier package repositories</title>
-<body style="font-family:system-ui;max-width:760px;margin:40px auto;padding:0 16px;line-height:1.5">
-<h1>Courier package repositories</h1>
-<h2>Debian / Ubuntu (apt)</h2>
-<pre>sudo install -d -m 0755 /etc/apt/keyrings
-curl -fsSL $BASE/courier.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/courier.gpg
-echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/courier.gpg] $BASE/apt stable main" | sudo tee /etc/apt/sources.list.d/courier.list
-sudo apt update &amp;&amp; sudo apt install courier-api</pre>
-<h2>Fedora / RHEL (dnf)</h2>
-<pre>sudo curl -fsSL -o /etc/yum.repos.d/courier.repo $BASE/rpm/courier.repo
-sudo dnf install courier-api</pre>
-<p><a href="https://github.com/ranefattesingh/courier">Source code and other platforms</a></p>
-</body>
-EOF
+# The landing page and docs are published separately by packaging/publish-website.sh.
 touch "$SITE/.nojekyll"
 echo "repositories updated in $SITE"
