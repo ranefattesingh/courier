@@ -1,4 +1,4 @@
-# Homebrew cask template. The release workflow fills in @VERSION@ and @SHA256@ and
+# Homebrew cask template. The release workflow fills in the version and checksum placeholders and
 # pushes the result to https://github.com/ranefattesingh/homebrew-tap as Casks/courier.rb.
 #
 # Install:  brew install --cask ranefattesingh/tap/courier

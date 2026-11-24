@@ -70,6 +70,20 @@ void main() {
       }
     }
 
+    // "Bulk Edit" fits on one line (it used to be squeezed into a narrow column and wrap per letter),
+    // and toggles between the table and the text editor.
+    await tester.tap(find.textContaining('Headers').first);
+    await tester.pumpAndSettle();
+    final bulk = find.text('Bulk Edit');
+    expect(bulk, findsWidgets);
+    expect(tester.getSize(bulk.first).height, lessThan(20));
+    await tester.tap(bulk.first);
+    await tester.pumpAndSettle();
+    expect(find.text('Key-Value Edit'), findsOneWidget);
+    await tester.tap(find.text('Key-Value Edit'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
     // Edit the URL and verify params sync + dirty state.
     state.currentTab!.draft.url = '{{baseUrl}}/get?x=1';
     state.markDirty(state.currentTab!);
