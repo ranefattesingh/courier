@@ -8,7 +8,7 @@
 PRODUCT_NAME = Courier
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = dev.courier.courier
+PRODUCT_BUNDLE_IDENTIFIER = io.github.ranefattesingh.courier
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 dev.courier. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 Fattesingh Rane. MIT License.

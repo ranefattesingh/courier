@@ -149,7 +149,7 @@ class _TopBar extends StatelessWidget {
           width: 24,
           height: 24,
           decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(6)),
-          child: const Icon(Icons.send_rounded, size: 14, color: Colors.white),
+          child: const Icon(Icons.send_rounded, size: 14, color: onAccent),
         ),
         const SizedBox(width: 8),
         const Text('Courier', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
@@ -182,7 +182,7 @@ class _TopBar extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(color: cs.primary, borderRadius: BorderRadius.circular(4)),
-            child: const Row(children: [Icon(Icons.add, size: 16, color: Colors.white), SizedBox(width: 4), Text('New', style: TextStyle(color: Colors.white, fontSize: 13))]),
+            child: Row(children: [Icon(Icons.add, size: 16, color: cs.onPrimary), const SizedBox(width: 4), Text('New', style: TextStyle(color: cs.onPrimary, fontSize: 13, fontWeight: FontWeight.w500))]),
           ),
         ),
         const SizedBox(width: 8),
