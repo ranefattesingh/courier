@@ -467,16 +467,26 @@ class _KvTableState extends State<KvTable> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final header = TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: cs.onSurfaceVariant);
-    final bulkToggle = TextButton(
-      onPressed: () => setState(() {
-        _bulk = !_bulk;
-        _gen++;
-      }),
-      child: Text(_bulk ? 'Key-Value Edit' : 'Bulk Edit', style: const TextStyle(fontSize: 12)),
+    // Sits above the table (same place in both modes) so it never gets squeezed into a column.
+    final bulkToggle = Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          minimumSize: const Size(0, 28),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
+        onPressed: () => setState(() {
+          _bulk = !_bulk;
+          _gen++;
+        }),
+        child: Text(_bulk ? 'Key-Value Edit' : 'Bulk Edit', style: const TextStyle(fontSize: 12), maxLines: 1, softWrap: false),
+      ),
     );
     if (_bulk) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Align(alignment: Alignment.centerRight, child: bulkToggle),
+        bulkToggle,
         SizedBox(
           height: 220,
           child: CodeEditor(value: _toBulk(), language: 'text', onChanged: _fromBulk, hint: 'key:value, one per line. Prefix with // to disable.'),
@@ -485,6 +495,7 @@ class _KvTableState extends State<KvTable> {
     }
     final all = [...widget.rows, null];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      bulkToggle,
       Container(
         decoration: BoxDecoration(border: Border.all(color: cs.outlineVariant)),
         child: Column(children: [
@@ -497,7 +508,7 @@ class _KvTableState extends State<KvTable> {
               Expanded(flex: 4, child: Padding(padding: const EdgeInsets.only(left: 8), child: Text(widget.valueHint, style: header))),
               if (widget.showDescription)
                 Expanded(flex: 3, child: Padding(padding: const EdgeInsets.only(left: 8), child: Text('Description', style: header))),
-              SizedBox(width: widget.allowSecret ? 72 : 40, child: Align(alignment: Alignment.centerRight, child: bulkToggle)),
+              SizedBox(width: widget.allowSecret ? 72 : 40),
               const SizedBox(width: 30),
             ]),
           ),
