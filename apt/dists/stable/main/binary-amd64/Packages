@@ -1,0 +1,21 @@
+Package: courier-api
+Architecture: amd64
+Version: 1.0.0
+Priority: optional
+Section: devel
+Maintainer: Fattesingh Rane <41385129+ranefattesingh@users.noreply.github.com>
+Installed-Size: 30288
+Depends: libgtk-3-0t64 | libgtk-3-0, libegl1, libgles2
+Filename: pool/main/courier-api_1.0.0_amd64.deb
+Size: 9163212
+MD5sum: 74238947029868a80ba20ddfe517ef8f
+SHA1: be3cb0e2584345e94ed29f49a87a0f64bdd2a954
+SHA256: cac47c311bfd5adc13a23502dfca979868ca129d9afaad57b8e66bee53f43d69
+SHA512: 81a889773142ebf3fcd10ca2dff12be28fc4f4fc5ac8a6d13284fcef0d204f71fcaf4471e3ce555a7022a6b9aa0df0b61b4982672b22c788c450aa17adc99b57
+Homepage: https://github.com/ranefattesingh/courier
+Description: Desktop API client for HTTP, GraphQL, gRPC, WebSocket, MQTT, Kafka and more
+ Courier is a free, open-source, local-first API client. Organise requests in
+ collections and nested folders, switch environments, and test REST, GraphQL,
+ gRPC, WebSocket, Socket.IO, MQTT, Server-Sent Events, SOAP and Kafka with every
+ common authentication scheme. No account or cloud sync required.
+

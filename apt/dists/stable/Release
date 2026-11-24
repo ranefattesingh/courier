@@ -1,0 +1,23 @@
+Architectures: amd64
+Codename: stable
+Components: main
+Date: Tue, 24 Nov 2026 11:40:44 +0000
+Label: Courier
+Origin: Courier
+Suite: stable
+MD5Sum:
+ b8ca6c87839671f40e8ef86bee032cbc              138 Release
+ 47088a8e8ef3deb380a7ef588f2706b2             1051 main/binary-amd64/Packages
+ 3a45edfd456fe02106a70f3509b5d5f4              714 main/binary-amd64/Packages.gz
+SHA1:
+ ccabe6bf0ca9c1c782f4fd2911ed133c6c6ac5ec              138 Release
+ 321d1df1665a222345912f0dad93c8fb3f8aee10             1051 main/binary-amd64/Packages
+ b1b91b3b245a057926c4c6900ccb2fa9b8a17b71              714 main/binary-amd64/Packages.gz
+SHA256:
+ 53b2f4e29a75610e0ee26faa49149c21eb22bfd86f82b306547bba0bff03b8e3              138 Release
+ cf424bc08737654682aefe458ff8995e92b6209b7a282ad73e1b39ee98d18478             1051 main/binary-amd64/Packages
+ a89903a9694fd972a952d406410ffacc63aedd9f9f1dd1bf190d2a45db642d18              714 main/binary-amd64/Packages.gz
+SHA512:
+ 10fdfb4f8c639834a659c3acc86c6d28b1eb0cad7d58cad7d232fdba00c7bfa9422179bc73371dcccd726463d5c7dca916b3d7f5bad314e34134a532f9061736              138 Release
+ 45d9fc7a80c2225a140b9cda15ee28d5e011d7ee126813c6981eb84d1a81c06999729547fc011e3610b7b385093a04d3a3ab452b9de1a6dc64311213603c2eea             1051 main/binary-amd64/Packages
+ 3ee58658b0f899acb559c373bd0b761feae4adb8635f3e223dfeb51476444115990496194591abb53306a02e38e083c8cd954be6b2ecf791aa26e4e758574648              714 main/binary-amd64/Packages.gz
